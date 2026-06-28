@@ -1,26 +1,30 @@
-# Development Workflow
+# Development Workflow / 開發流程
 
-## Goal
+> This file is kept as a short entry point. The full bilingual governance workflow is under `docs/governance/`.
+>
+> 本文件保留作為簡短入口。完整雙語治理流程在 `docs/governance/`。
 
-Keep development safe when multiple AI agents or machines edit StockOverlayViewer.
-
-## One source of truth
-
-`docs/Contract.md` is the canonical data contract. If implementation and documentation disagree, reconcile the contract first.
-
-## Standard workflow
+## Standard Workflow / 標準流程
 
 1. Read `STATUS.md`.
-2. Read `docs/Contract.md`.
-3. Check Git status.
-4. Work on a task branch.
-5. Make small changes.
-6. Test the smallest useful path.
-7. Update docs when behavior or data shapes change.
-8. Update `STATUS.md`.
-9. Commit with an agent prefix.
+   閱讀 `STATUS.md`。
 
-## Local run
+2. Read `docs/Contract.md`.
+   閱讀 `docs/Contract.md`。
+
+3. Check Git status.
+   檢查 Git 狀態。
+
+4. Work on a task branch.
+   在任務分支工作。
+
+5. Update docs and status before finishing.
+   收工前更新文件與狀態。
+
+6. Commit with an agent prefix.
+   使用 Agent 前綴建立 commit。
+
+## Local Run / 本機啟動
 
 ```powershell
 cd D:\MarketResearch\Apps\StockOverlayViewer
@@ -33,39 +37,8 @@ Open:
 http://localhost:5174
 ```
 
-Use the UI button:
+## Full Docs / 完整文件
 
 ```text
-Start Mock Feed
+docs/governance/README.md
 ```
-
-Manual fallback:
-
-```powershell
-.\scripts\StartDataCollector.ps1 -Mock -IntervalSeconds 2 -DurationSeconds 60
-```
-
-## Contract change workflow
-
-For any JSON shape change:
-
-1. Update `docs/Contract.md` first.
-2. Update data writer.
-3. Update frontend reader.
-4. Update sample data.
-5. Test with current UI.
-
-## Runtime data policy
-
-Generated quote files are runtime artifacts and should normally stay out of Git:
-
-- `data/intraday/*.json`
-- `data/daily/*.json`
-- `data/latest.json`
-- `data/collector.pid`
-
-## Known current issues
-
-- Stock name lookup through the current endpoint may miss valid symbols.
-- A local stock metadata cache should be built before real data integration.
-- `backend/StockOverlay.Api` is optional and not part of MVP runtime.

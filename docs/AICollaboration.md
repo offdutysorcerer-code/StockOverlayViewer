@@ -1,72 +1,46 @@
-# AI Collaboration Guide
+# AI Collaboration Guide / AI 協作指南
 
-This project may be edited by multiple agents: ChatGPT conversations, LM Studio instances, and future local tools.
+> This file is kept as an entry point. The bilingual governance docs are now under `docs/governance/`.
+>
+> 本文件保留作為入口。正式雙語治理文件已移到 `docs/governance/`。
 
-## Required start procedure
+## Start Here / 從這裡開始
 
-Before editing, every agent must read:
+請依序閱讀：
+
+Read in this order:
 
 1. `STATUS.md`
 2. `docs/Contract.md`
-3. `docs/Architecture.md`
-4. `docs/GitStrategy.md`
-5. The files it plans to edit
+3. `docs/governance/README.md`
+4. `docs/governance/03_GitWorkflow.md`
+5. `docs/governance/04_AICollaboration.md`
 
-## Required finish procedure
+## Core Rule / 核心規則
 
-After editing, every agent must:
+任何 JSON 結構、API payload、檔案路徑的變更，都必須先更新 `docs/Contract.md`。
 
-1. Update `STATUS.md`.
-2. Run a quick check if possible.
-3. Record changed files in its final message.
-4. Commit only its own scoped changes or leave a clear note saying no commit was made.
+Any JSON shape, API payload, or file path change must update `docs/Contract.md` first.
 
-## Ownership map
+## Agent Prefix / Agent 前綴
 
-Default ownership is advisory, not absolute. If a change crosses ownership, update `STATUS.md` first.
+Commit message must use one of:
 
-| Area | Primary owner | Notes |
-|---|---|---|
-| `frontend/` | ChatGPT | UI, chart rendering, user interactions |
-| `scripts/` | LM Studio / ChatGPT | Data collector and local PowerShell server |
-| `data/groups.json` | Shared | Contract-sensitive user configuration |
-| `data/symbols.json` | Shared | Stock metadata cache |
-| `data/intraday/` | Runtime | Generated files; should normally be ignored |
-| `data/daily/` | Runtime | Generated files; should normally be ignored |
-| `docs/Contract.md` | Shared | Must be updated before breaking data shape changes |
-| `docs/` | Shared | Architecture, workflow, roadmap |
-| `backend/` | Future backend owner | Optional ASP.NET Core backup path |
-
-## Conflict prevention
-
-- Do not rewrite entire files unless necessary.
-- Prefer small, scoped edits.
-- Do not modify generated data files unless the task is about data generation.
-- Do not silently change JSON shapes.
-- Do not change both frontend and data contract without documenting the compatibility impact.
-
-## Agent labels
-
-Use these commit prefixes:
+Commit 訊息必須使用：
 
 ```text
-[ChatGPT] message
-[LM] message
-[Human] message
+[ChatGPT]
+[LM]
+[Human]
+[Collab]
 ```
 
-For multi-agent work, use:
+## Ownership / 權責
+
+完整權責請見：
+
+See full ownership rules in:
 
 ```text
-[Collab] message
-```
-
-## Status meanings
-
-```text
-IDLE       not working
-PLANNING   reading and planning
-WORKING    editing files
-BLOCKED    waiting for human decision or tool access
-DONE       finished changes and updated status
+docs/governance/AgentManifest.md
 ```

@@ -1,14 +1,18 @@
-# Git Strategy
+# Git Strategy / Git 策略
 
-## Current goal
+> This file is kept as a short entry point. The bilingual canonical workflow is in `docs/governance/03_GitWorkflow.md`.
+>
+> 本文件保留作為簡短入口。正式雙語 Git 流程在 `docs/governance/03_GitWorkflow.md`。
 
-Use Git to make multi-agent development safe and reversible.
+## Branches / 分支
 
-## Branch model
+`master` should stay stable.
 
-Keep `master` stable. New work should happen on topic branches.
+`master` 應保持穩定。
 
-Suggested branch names:
+Use task branches:
+
+使用任務分支：
 
 ```text
 chatgpt/<short-task>
@@ -17,73 +21,34 @@ human/<short-task>
 collab/<short-task>
 ```
 
-Examples:
+## Commit Prefix / Commit 前綴
 
 ```text
-chatgpt/daily-overlay
-lm/stock-metadata-cache
-collab/contract-v2
+[ChatGPT]
+[LM]
+[Human]
+[Collab]
 ```
 
-## Commit rules
+## Runtime Data / Runtime 資料
 
-Commit messages must include agent prefix:
+Do not commit runtime quote output.
+
+不要提交即時產生的報價資料。
 
 ```text
-[ChatGPT] Add progressive mock feed controls
-[LM] Add TWSE stock metadata fetcher
-[Human] Adjust watchlist symbols
-[Collab] Align data contract with implementation
+data/intraday/*.json
+data/daily/*.json
+data/latest.json
+data/collector.pid
 ```
 
-Each commit should contain one coherent change.
+## Full Workflow / 完整流程
 
-## What to commit
+See:
 
-Commit:
-
-- Source code under `frontend/`, `scripts/`, `backend/`.
-- Canonical configuration such as `data/groups.json`, `data/groups.sample.json`, `data/symbols.json`.
-- Documentation under `docs/`.
-- `STATUS.md` when it records meaningful coordination state.
-
-Do not commit:
-
-- Runtime quote output under `data/intraday/*.json`.
-- Runtime quote output under `data/daily/*.json`.
-- `data/latest.json`.
-- `data/collector.pid`.
-- Logs, temp files, editor caches.
-
-## Before starting work
-
-```powershell
-git status --short --branch
-```
-
-If there are unrelated changes, do not overwrite them. Read `STATUS.md` and ask for direction.
-
-## Before committing
-
-```powershell
-git status --short
-git diff --stat
-```
-
-For PowerShell scripts, run at least a syntax check when possible:
-
-```powershell
-$errors = $null
-[System.Management.Automation.PSParser]::Tokenize((Get-Content .\scripts\StartFrontend.ps1 -Raw), [ref]$errors) | Out-Null
-$errors
-```
-
-## Initial baseline recommendation
-
-The first commit should establish the current MVP baseline and collaboration rules after generated files are ignored.
-
-Suggested message:
+請見：
 
 ```text
-[Collab] Establish StockOverlayViewer MVP baseline
+docs/governance/03_GitWorkflow.md
 ```
