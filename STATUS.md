@@ -9,7 +9,7 @@ This file is the live coordination board for multi-agent collaboration. It stays
 | Agent | Status | Files / Area | Notes |
 |---|---|---|---|
 | LM Studio | ONBOARDING | `AGENTS.md`, `STATUS.md`, `PROJECT_STATE.md`, `docs/Contract.md` | Read onboarding files. Confirmed Git workflow and contract rules. Ready for task assignment. |
-| ChatGPT | REVIEW | metadata builder, local symbol lookup, frontend charts, documentation | Built 1,980-symbol official TWSE/TPEx cache; completed Phase 0/1 viewer; verified PowerShell, ES modules, HTTP API, and Chromium rendering. Branch: `chatgpt/complete-local-mvp`. |
+| ChatGPT | REVIEW | metadata builder/importer, local symbol lookup, frontend charts, documentation | Built 1,980-symbol cache; fixed Windows PowerShell UTF-8 JSON import; completed Phase 0/1 viewer and verification. Branch: `chatgpt/complete-local-mvp`. |
 | Human | REVIEW | onboarding flow, Git branch | Review `AGENTS.md` and onboarding instructions before merge. |
 
 ## First Entry / 第一入口

@@ -49,3 +49,12 @@ Commit: `1f7e7cc [ChatGPT] Complete local viewer charts and status feedback`
 ## Remaining Roadmap
 
 Phase 0 and Phase 1 are complete. Phase 2 and Phase 3 production quote collection remain provider work; the current runtime intentionally continues to use the contract-compatible mock collector. Phase 4 is optional by project definition.
+
+
+## Follow-up - Import Encoding Fix
+
+- Reproduced the attachment error with `Get-Content data/symbols.json | ConvertFrom-Json` under Windows PowerShell 5.1.
+- Root cause: `Import-StockMetadata.ps1` read UTF-8 without BOM through the legacy default code page.
+- Replaced the read path with `File.ReadAllText(..., Encoding.UTF8)`.
+- Replaced `Set-Content -Encoding UTF8` with explicit UTF-8 without BOM output.
+- Verified all 1,980 records, the Chinese value `台積電`, a UTF-8 round trip, and zero parser errors.

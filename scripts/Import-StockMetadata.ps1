@@ -80,7 +80,8 @@ if ($JsonFile) {
     
     Write-Host "[1/3] Reading JSON file: $JsonFile" -ForegroundColor Cyan
     
-    $jsonData = Get-Content $JsonFile | ConvertFrom-Json
+    $jsonText = [System.IO.File]::ReadAllText($JsonFile, [System.Text.Encoding]::UTF8)
+    $jsonData = $jsonText | ConvertFrom-Json
     
     foreach ($key in $jsonData.PSObject.Properties.Name) {
         $item = $jsonData.$key
@@ -117,7 +118,8 @@ if ((Test-Path $outputFile) -and (Get-Item $outputFile).Length -gt 0) {
     Write-Host "Backup created: $backupName" -ForegroundColor Yellow
 }
 
-# Save new data
+# Save new data as UTF-8 without BOM, matching docs/Contract.md.
 $symbolsJson = $symbols | ConvertTo-Json -Depth 10
-Set-Content -Path $outputFile -Value $symbolsJson -Encoding UTF8
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+[System.IO.File]::WriteAllText($outputFile, $symbolsJson + [Environment]::NewLine, $utf8NoBom)
 Write-Host "Success! Updated $($symbols.Count) stocks." -ForegroundColor Green
