@@ -1,0 +1,19 @@
+{
+  "2303": { "name": "UMC", "displayName": "UMC" },
+  "2308": { "name": "Delta Electronics", "displayName": "Delta" },
+  "2327": { "name": "Yageo", "displayName": "Yageo" },
+  "2330": { "name": "TSMC", "displayName": "TSMC" },
+  "2356": { "name": "Inventec", "displayName": "Inventec" },
+  "2382": { "name": "Quanta", "displayName": "Quanta" },
+  "2454": { "name": "MediaTek", "displayName": "MediaTek" },
+  "2481": { "name": "Pan Jit", "displayName": "Pan Jit" },
+  "2492": { "name": "Walsin Technology", "displayName": "Walsin" },
+  "3016": { "name": "Episil", "displayName": "Episil" },
+  "3026": { "name": "Holy Stone", "displayName": "Holy Stone" },
+  "3034": { "name": "Novatek", "displayName": "Novatek" },
+  "3231": { "name": "Wistron", "displayName": "Wistron" },
+  "5425": { "name": "TSC", "displayName": "TSC" },
+  "6669": { "name": "Wiwynn", "displayName": "Wiwynn" },
+  "8043": { "name": "Honey Hope", "displayName": "Honey Hope" },
+  "8261": { "name": "AP Memory", "displayName": "AP Memory" }
+}

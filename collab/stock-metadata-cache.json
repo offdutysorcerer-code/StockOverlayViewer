@@ -1,0 +1,20 @@
+{
+  "lastUpdated": "",
+  "source": "local-cache",
+  "symbols": {
+    "2330": {
+      "name": "TSMC",
+      "industry": "Semiconductors",
+      "sector": "Technology",
+      "marketCap": null,
+      "description": "Taiwan Semiconductor Manufacturing Company Limited"
+    },
+    "2317": {
+      "name": "United Microelectronics",
+      "industry": "Semiconductors",
+      "sector": "Technology",
+      "marketCap": null,
+      "description": "United Microelectronics Corporation"
+    }
+  }
+}
