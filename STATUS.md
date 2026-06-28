@@ -1,16 +1,37 @@
 # Project Status / 專案狀態
 
-此文件是多 Agent 協作時的即時看板。
+此文件是多 Agent 協作時的即時看板，保留在專案根目錄，方便所有 Agent 一開始就讀取。
 
-This file is the live coordination board for multi-agent collaboration.
+This file is the live coordination board for multi-agent collaboration. It stays at the project root so every agent can find it first.
 
 ## Current Status / 目前狀態
 
 | Agent | Status | Files / Area | Notes |
 |---|---|---|---|
 | LM Studio | IDLE | `scripts/`, `data/`, `docs/Contract.md` | Waiting for next task. |
-| ChatGPT | DONE | `docs/governance/`, `docs/*.md`, `STATUS.md` | Added bilingual governance structure. |
-| Human | REVIEW | governance docs, Git branch | Review bilingual governance docs before merge. |
+| ChatGPT | DONE | `docs/`, `STATUS.md` | Reorganized documentation into governance, product, and archive areas. |
+| Human | REVIEW | docs structure, Git branch | Review the new documentation structure before merge. |
+
+## Documentation Entry / 文件入口
+
+請從這裡開始：
+
+Start here:
+
+```text
+docs/README.md
+```
+
+核心文件：
+
+Core files:
+
+```text
+docs/Contract.md                 canonical data contract / 正式資料契約
+docs/governance/README.md        governance index / 治理文件入口
+docs/product/README.md           product docs index / 產品文件入口
+docs/archive/legacy/README.md    archived legacy docs / 舊文件歸檔
+```
 
 ## Coordination Rules / 協作規則
 
