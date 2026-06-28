@@ -4,11 +4,28 @@
 
 This folder uses a clear-entry, centralized-governance, archived-legacy structure.
 
+## First Entry / 第一入口
+
+所有 AI Agent 應先從專案根目錄的 `AGENTS.md` 開始。
+
+Every AI agent should start from the root-level `AGENTS.md`.
+
+```text
+AGENTS.md
+STATUS.md
+PROJECT_STATE.md
+docs/README.md
+docs/Contract.md
+docs/governance/README.md
+```
+
 ## 必讀入口 / Required Entry Points
 
 | 文件 File | 用途 Purpose |
 |---|---|
+| `../AGENTS.md` | AI onboarding entry / AI 協作者入口 |
 | `../STATUS.md` | 即時協作狀態 / live collaboration board |
+| `../PROJECT_STATE.md` | 穩定專案狀態 / stable project state |
 | `Contract.md` | 唯一正式資料契約 / canonical data contract |
 | `governance/README.md` | 治理文件入口 / governance docs index |
 

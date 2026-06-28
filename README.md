@@ -4,6 +4,28 @@
 
 Purpose: manage stock symbols by groups and overlay selected price charts for quick market observation.
 
+## New Collaborators / 新協作者
+
+所有新 AI Agent 或協作者請先閱讀：
+
+All new AI agents or collaborators should start here:
+
+```text
+AGENTS.md
+```
+
+接著依序閱讀：
+
+Then read:
+
+```text
+STATUS.md
+PROJECT_STATE.md
+docs/README.md
+docs/Contract.md
+docs/governance/README.md
+```
+
 ## Current MVP / 目前 MVP
 
 ```text
@@ -56,7 +78,9 @@ docs/README.md
 Key files:
 
 ```text
+AGENTS.md                         AI onboarding entry
 STATUS.md                         live collaboration status
+PROJECT_STATE.md                  stable project state
 docs/Contract.md                  canonical data contract
 docs/governance/README.md         governance docs
 docs/product/README.md            product docs
@@ -67,6 +91,8 @@ docs/archive/legacy/README.md     archived legacy docs
 
 ```text
 StockOverlayViewer/
+├── AGENTS.md
+├── PROJECT_STATE.md
 ├── README.md
 ├── STATUS.md
 ├── docs/
@@ -76,23 +102,9 @@ StockOverlayViewer/
 │   ├── product/
 │   └── archive/
 ├── frontend/
-│   ├── index.html
-│   ├── css/styles.css
-│   └── js/
 ├── data/
-│   ├── groups.json
-│   ├── groups.sample.json
-│   ├── symbols.json
-│   ├── intraday/
-│   ├── daily/
-│   └── cache/
 ├── scripts/
-│   ├── StartFrontend.ps1
-│   ├── StartDataCollector.ps1
-│   ├── FetchIntraday.Mock.ps1
-│   └── FetchDaily.Mock.ps1
 └── backend/
-    └── StockOverlay.Api/
 ```
 
 ## Collaboration / 協作
@@ -102,7 +114,9 @@ StockOverlayViewer/
 This project supports multi-agent and multi-machine collaboration. Before editing, read:
 
 ```text
+AGENTS.md
 STATUS.md
+PROJECT_STATE.md
 docs/Contract.md
 docs/governance/README.md
 ```

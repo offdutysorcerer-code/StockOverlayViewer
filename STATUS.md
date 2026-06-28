@@ -9,28 +9,34 @@ This file is the live coordination board for multi-agent collaboration. It stays
 | Agent | Status | Files / Area | Notes |
 |---|---|---|---|
 | LM Studio | IDLE | `scripts/`, `data/`, `docs/Contract.md` | Waiting for next task. |
-| ChatGPT | DONE | `docs/`, `STATUS.md` | Reorganized documentation into governance, product, and archive areas. |
-| Human | REVIEW | docs structure, Git branch | Review the new documentation structure before merge. |
+| ChatGPT | DONE | `AGENTS.md`, `PROJECT_STATE.md`, docs index | Added explicit onboarding entry for new collaborators. |
+| Human | REVIEW | onboarding flow, Git branch | Review `AGENTS.md` and onboarding instructions before merge. |
 
-## Documentation Entry / 文件入口
+## First Entry / 第一入口
 
-請從這裡開始：
+所有新協作者請先閱讀：
 
-Start here:
+All new collaborators should start here:
 
 ```text
-docs/README.md
+AGENTS.md
 ```
+
+## Documentation Entry / 文件入口
 
 核心文件：
 
 Core files:
 
 ```text
-docs/Contract.md                 canonical data contract / 正式資料契約
-docs/governance/README.md        governance index / 治理文件入口
-docs/product/README.md           product docs index / 產品文件入口
-docs/archive/legacy/README.md    archived legacy docs / 舊文件歸檔
+AGENTS.md                         AI onboarding entry / AI 協作者入口
+STATUS.md                         live collaboration board / 即時協作看板
+PROJECT_STATE.md                  stable project state / 穩定狀態摘要
+docs/README.md                    documentation index / 文件索引
+docs/Contract.md                  canonical data contract / 正式資料契約
+docs/governance/README.md         governance index / 治理文件入口
+docs/product/README.md            product docs index / 產品文件入口
+docs/archive/legacy/README.md     archived legacy docs / 舊文件歸檔
 ```
 
 ## Coordination Rules / 協作規則
