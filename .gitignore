@@ -4,8 +4,9 @@ data/daily/*.json
 data/latest.json
 data/collector.pid
 
-# Logs and temp files
+# Logs, generated backups, and temp files
 logs/
+collab/stock-metadata-cache/symbols_backup_*.json
 *.log
 *.tmp
 *.bak

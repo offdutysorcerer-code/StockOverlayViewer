@@ -1,111 +1,146 @@
-# Get-TaiwanStockMetadata.ps1
-# Purpose: Fetch complete Taiwan stock list (上市/上櫃) from TWSE Open API and save to project format.
+param(
+    [string]$OutputPath,
+    [int]$RetryCount = 3
+)
 
-$projectRoot = "D:\MarketResearch\Apps\StockOverlayViewer"
-$outputFile = Join-Path $projectRoot "data\symbols.json"
-$tempDir = Join-Path $projectRoot "collab\stock-metadata-cache"
+$ErrorActionPreference = "Stop"
+$ProgressPreference = "SilentlyContinue"
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-# Ensure temp directory exists
-if (-not (Test-Path $tempDir)) { New-Item -ItemType Directory -Force -Path $tempDir | Out-Null }
+$projectRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+if ([string]::IsNullOrWhiteSpace($OutputPath)) {
+    $OutputPath = Join-Path $projectRoot "data\symbols.json"
+}
 
-$today = Get-Date -Format "yyyyMMdd"
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+$updatedAt = [DateTimeOffset]::Now.ToString("o")
 
-Write-Host "[1/4] Fetching TWSE Listed Stocks..." -ForegroundColor Cyan
-try {
-    # Use CSV format for better stability
-    $urlListed = "https://openapi.twse.com.tw/v1/exchangeReport/TWSE_ALL.csv?date=$today&selectType=ALL"
-    $webClient = New-Object System.Net.WebClient
-    $webClient.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-    $csvContentListed = $webClient.DownloadString($urlListed)
-    
-    # Parse CSV: Stock Code, Name, Price, Change, etc.
-    $listedData = $csvContentListed -split "`n" | Where-Object { $_ -ne "" } | ForEach-Object {
-        $parts = $_ -split ","
-        if ($parts.Count -ge 2) {
-            [PSCustomObject]@{
-                "股票代號" = $parts[0].Trim()
-                "股票名稱" = $parts[1].Trim()
+function Get-OfficialJson {
+    param(
+        [Parameter(Mandatory = $true)][string]$Uri,
+        [Parameter(Mandatory = $true)][string]$Label
+    )
+
+    $lastError = $null
+    for ($attempt = 1; $attempt -le $RetryCount; $attempt += 1) {
+        try {
+            $client = New-Object System.Net.WebClient
+            $client.Headers["Accept"] = "application/json"
+            $client.Headers["User-Agent"] = "StockOverlayViewer/1.0"
+            $bytes = $client.DownloadData($Uri)
+            $json = [Text.Encoding]::UTF8.GetString($bytes)
+            $data = @($json | ConvertFrom-Json)
+            if ($data.Count -eq 0) {
+                throw "$Label returned no records."
+            }
+            return $data
+        }
+        catch {
+            $lastError = $_
+            if ($attempt -lt $RetryCount) {
+                Start-Sleep -Seconds ([Math]::Min($attempt * 2, 5))
             }
         }
     }
-} catch {
-    Write-Warning "Failed to fetch listed stocks: $_"
-    $listedData = @()
+
+    throw "Failed to download $Label after $RetryCount attempts: $($lastError.Exception.Message)"
 }
 
-Write-Host "[2/4] Fetching TWSE OTC Stocks..." -ForegroundColor Cyan
-try {
-    $urlOtc = "https://openapi.twse.com.tw/v1/otter/allAllAll.csv?date=$today&selectType=ALL"
-    $webClientOtc = New-Object System.Net.WebClient
-    $webClientOtc.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-    $csvContentOtc = $webClientOtc.DownloadString($urlOtc)
-    
-    # Parse CSV: Stock Code, Name, Price, Change, etc.
-    $otcData = $csvContentOtc -split "`n" | Where-Object { $_ -ne "" } | ForEach-Object {
-        $parts = $_ -split ","
-        if ($parts.Count -ge 2) {
-            [PSCustomObject]@{
-                "證券代號" = $parts[0].Trim()
-                "證券名稱" = $parts[1].Trim()
-            }
-        }
+function Add-Symbol {
+    param(
+        [hashtable]$Symbols,
+        [string]$Code,
+        [string]$DisplayName,
+        [string]$Name,
+        [string]$Market,
+        [string]$Industry,
+        [string]$Source
+    )
+
+    $normalizedCode = "$Code".Trim()
+    if ($normalizedCode -notmatch "^\d{4}$") {
+        return
     }
-} catch {
-    Write-Warning "Failed to fetch OTC stocks: $_"
-    $otcData = @()
+
+    $normalizedDisplayName = "$DisplayName".Trim()
+    if ([string]::IsNullOrWhiteSpace($normalizedDisplayName)) {
+        return
+    }
+
+    $normalizedName = "$Name".Trim()
+    if ([string]::IsNullOrWhiteSpace($normalizedName)) {
+        $normalizedName = $normalizedDisplayName
+    }
+
+    $Symbols[$normalizedCode] = [ordered]@{
+        name = $normalizedName
+        displayName = $normalizedDisplayName
+        market = $Market
+        industry = "$Industry".Trim()
+        source = $Source
+        updatedAt = $updatedAt
+    }
 }
 
-Write-Host "[3/4] Processing data..." -ForegroundColor Cyan
+Write-Host "[1/4] Downloading TWSE listed-company metadata..." -ForegroundColor Cyan
+$twse = Get-OfficialJson -Uri "https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL" -Label "TWSE listed-company metadata"
+
+Write-Host "[2/4] Downloading TPEx OTC-company metadata..." -ForegroundColor Cyan
+$tpex = Get-OfficialJson -Uri "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap03_O" -Label "TPEx OTC-company metadata"
+
 $symbols = @{}
 
-# Process Listed Stocks (上市)
-if ($listedData) {
-    foreach ($stock in $listedData) {
-        $code = $stock["股票代號"]
-        if ([string]::IsNullOrWhiteSpace($code)) { continue }
-        
-        $codeStr = $code.PadLeft(4, '0')
-        
-        $symbols[$codeStr] = @{
-            "name" = $stock["股票名稱"]
-            "displayName" = $stock["股票名稱"]
-            "type" = "上市"
-        }
-    }
+foreach ($stock in $twse) {
+    Add-Symbol -Symbols $symbols -Code $stock.Code -DisplayName $stock.Name -Name $stock.Name -Market "TWSE" -Industry "" -Source "twse-openapi:STOCK_DAY_ALL"
 }
 
-# Process OTC Stocks (上櫃)
-if ($otcData) {
-    foreach ($stock in $otcData) {
-        $code = $stock["證券代號"]
-        if ([string]::IsNullOrWhiteSpace($code)) { continue }
-        
-        $codeStr = $code.PadLeft(4, '0')
-        
-        if (-not $symbols.ContainsKey($codeStr)) {
-            $symbols[$codeStr] = @{
-                "name" = $stock["證券名稱"]
-                "displayName" = $stock["證券名稱"]
-                "type" = "上櫃"
-            }
-        }
-    }
+foreach ($stock in $tpex) {
+    Add-Symbol -Symbols $symbols -Code $stock.SecuritiesCompanyCode -DisplayName $stock.CompanyAbbreviation -Name $stock.Symbol -Market "TPEx" -Industry $stock.SecuritiesIndustryCode -Source "tpex-openapi:mopsfin_t187ap03_O"
 }
 
-Write-Host "[4/4] Saving to $outputFile..." -ForegroundColor Cyan
-$symbolsJson = $symbols | ConvertTo-Json -Depth 10
+$twseCount = @($symbols.GetEnumerator() | Where-Object { $_.Value.market -eq "TWSE" }).Count
+$tpexCount = @($symbols.GetEnumerator() | Where-Object { $_.Value.market -eq "TPEx" }).Count
 
+if ($twseCount -lt 500 -or $tpexCount -lt 300) {
+    throw "Validation failed. Expected at least 500 TWSE and 300 TPEx stocks; received TWSE=$twseCount, TPEx=$tpexCount."
+}
+
+Write-Host "[3/4] Validated $($symbols.Count) stocks (TWSE=$twseCount, TPEx=$tpexCount)." -ForegroundColor Green
+
+$orderedSymbols = [ordered]@{}
+foreach ($code in @($symbols.Keys | Sort-Object)) {
+    $orderedSymbols[$code] = $symbols[$code]
+}
+
+$outputDirectory = Split-Path -Parent $OutputPath
+if (-not (Test-Path $outputDirectory)) {
+    New-Item -ItemType Directory -Force -Path $outputDirectory | Out-Null
+}
+
+$tempFile = Join-Path $outputDirectory ("symbols.{0}.tmp" -f [Guid]::NewGuid().ToString("N"))
 try {
-    # Backup existing file if it exists and is not empty
-    if ((Test-Path $outputFile) -and (Get-Item $outputFile).Length -gt 0) {
-        $backupName = Join-Path $tempDir "symbols_backup_$(Get-Date -Format 'yyyyMMdd_HHmmss').json"
-        Copy-Item $outputFile $backupName -Force
-        Write-Host "Backup created: $backupName" -ForegroundColor Yellow
+    $json = $orderedSymbols | ConvertTo-Json -Depth 5
+    [IO.File]::WriteAllText($tempFile, $json + [Environment]::NewLine, $utf8NoBom)
+
+    $verification = [IO.File]::ReadAllText($tempFile, [Text.Encoding]::UTF8) | ConvertFrom-Json
+    $verifiedCount = @($verification.PSObject.Properties).Count
+    if ($verifiedCount -ne $symbols.Count) {
+        throw "Written metadata verification failed: expected $($symbols.Count), found $verifiedCount."
     }
 
-    # Save new data
-    Set-Content -Path $outputFile -Value $symbolsJson -Encoding UTF8
-    Write-Host "Success! Updated $($symbols.Count) stocks." -ForegroundColor Green
-} catch {
-    Write-Error "Failed to save file: $_"
+    Move-Item -Path $tempFile -Destination $OutputPath -Force
 }
+finally {
+    if (Test-Path $tempFile) {
+        Remove-Item $tempFile -Force
+    }
+}
+
+Write-Host "[4/4] Saved UTF-8 metadata to $OutputPath." -ForegroundColor Green
+Write-Output ([PSCustomObject]@{
+    outputPath = $OutputPath
+    total = $symbols.Count
+    twse = $twseCount
+    tpex = $tpexCount
+    updatedAt = $updatedAt
+} | ConvertTo-Json -Compress)
