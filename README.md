@@ -65,6 +65,16 @@ Manual fallback:
 .\scripts\StartDataCollector.ps1 -Mock -IntervalSeconds 2 -DurationSeconds 60
 ```
 
+## Refresh Stock Metadata / 更新股票主檔
+
+Use the official TWSE and TPEx OpenAPI sources to rebuild the local cache:
+
+```powershell
+.\collab\stock-metadata-cache\Get-TaiwanStockMetadata.ps1
+```
+
+The script validates record counts and only replaces `data/symbols.json` after a complete UTF-8 write succeeds.
+
 ## Documentation / 文件
 
 請從文件索引開始：

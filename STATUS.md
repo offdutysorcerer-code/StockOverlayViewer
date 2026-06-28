@@ -9,7 +9,7 @@ This file is the live coordination board for multi-agent collaboration. It stays
 | Agent | Status | Files / Area | Notes |
 |---|---|---|---|
 | LM Studio | ONBOARDING | `AGENTS.md`, `STATUS.md`, `PROJECT_STATE.md`, `docs/Contract.md` | Read onboarding files. Confirmed Git workflow and contract rules. Ready for task assignment. |
-| ChatGPT | DONE | `data/symbols.json`, `collab/stock-metadata-cache/Get-TaiwanStockMetadata.ps1`, `scripts/Import-StockMetadata.ps1`, `frontend/js/app.js` | Added default stock list (30 major Taiwan stocks). Created fetch script with CSV parsing logic. Added frontend import button for manual symbol upload. Note: TWSE API and GitHub are currently inaccessible from this environment. |
+| ChatGPT | REVIEW | metadata builder, local symbol lookup, frontend charts, documentation | Built 1,980-symbol official TWSE/TPEx cache; completed Phase 0/1 viewer; verified PowerShell, ES modules, HTTP API, and Chromium rendering. Branch: `chatgpt/complete-local-mvp`. |
 | Human | REVIEW | onboarding flow, Git branch | Review `AGENTS.md` and onboarding instructions before merge. |
 
 ## First Entry / 第一入口
@@ -58,11 +58,11 @@ docs/archive/legacy/README.md     archived legacy docs / 舊文件歸檔
 - Runtime files under `data/intraday/`, `data/daily/`, `data/latest.json`, and `data/collector.pid` should not be committed.
   `data/intraday/`, `data/daily/`, `data/latest.json`, `data/collector.pid` 屬於 runtime 產物，不應提交。
 
-- Stock symbol lookup is not reliable enough yet.
-  股票名稱查詢目前仍不夠可靠。
+- Production real-time and historical quote providers are not integrated yet.
+  正式即時與歷史行情來源尚未整合。
 
 ## Next Recommended Task / 下一步建議
 
-建立本地股票主檔快取：`collab/stock-metadata-cache`。
+Evaluate and implement a production quote provider while preserving `docs/Contract.md`.
 
-Build a local stock metadata cache: `collab/stock-metadata-cache`.
+評估並實作正式行情來源，並維持 `docs/Contract.md` 契約。

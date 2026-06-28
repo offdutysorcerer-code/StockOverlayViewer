@@ -20,7 +20,7 @@ This file describes relatively stable project state. It is different from `STATU
 | Canonical contract | `docs/Contract.md` |
 | Governance docs | `docs/governance/` |
 | Current stable branch | `master` |
-| Current work branch | `chatgpt/bilingual-governance` |
+| Current work branch | `chatgpt/complete-local-mvp` |
 
 ## Current Runtime / 目前執行方式
 
@@ -74,37 +74,20 @@ scripts/StartDataCollector.ps1
 
 ## Current Known Limitations / 目前限制
 
-- Stock symbol lookup is not reliable enough yet.
-  股票名稱查詢目前仍不夠可靠。
-
 - Real-time market data is not integrated yet.
   尚未接入真實即時行情資料。
-
-- Daily chart area is still placeholder-level.
-  日 K 區域仍是 placeholder 等級。
 
 - `backend/StockOverlay.Api` is not part of the active MVP runtime.
   `backend/StockOverlay.Api` 不是目前 MVP runtime 的一部分。
 
+## Completed MVP Work / 已完成 MVP
+
+- Local metadata contains 1,980 four-digit TWSE and TPEx company symbols.
+- Symbol lookup reads `data/symbols.json` first.
+- Intraday overlay supports Actual and Indexed modes.
+- Daily candlestick chart supports symbol switching.
+- Source, update time, and stale warnings are visible.
+
 ## Next Recommended Work / 下一步建議
 
-建立本地股票主檔快取：
-
-Build local stock metadata cache:
-
-```text
-collab/stock-metadata-cache
-```
-
-目標：
-
-Goal:
-
-- 一次建立完整台股股票主檔。
-  Build a complete Taiwan stock metadata file.
-
-- 新增股票時先查本地 `data/symbols.json`。
-  Look up `data/symbols.json` first when adding symbols.
-
-- 網路查詢只作為補充。
-  Use online lookup only as fallback.
+Implement and evaluate a production quote provider for Phase 2 and Phase 3. Keep provider-specific logic in collector scripts and preserve the canonical JSON contract.

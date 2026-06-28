@@ -6,18 +6,18 @@
 - [x] 建立前端 HTML/CSS/JS 骨架
 - [x] 建立本地 JSON 資料結構
 - [x] 建立 mock data collector 腳本
-- [ ] 前端穩定讀取 data/groups.json
-- [ ] 前端讀取 data/intraday/{symbol}.json
-- [ ] 前端讀取 data/daily/{symbol}.json
+- [x] 前端穩定讀取 data/groups.json
+- [x] 前端讀取 data/intraday/{symbol}.json
+- [x] 前端讀取 data/daily/{symbol}.json
 
 ## Phase 1 - Local JSON Viewer
 
-- [ ] 使用者可以選取群組與股票代號
-- [ ] 即時走勢圖可疊加多檔股票
-- [ ] 每日 K 線圖可切換股票
-- [ ] 支援 Actual Price / Indexed Price 顯示模式
-- [ ] 顯示資料更新時間與資料來源
-- [ ] 顯示資料過期警示
+- [x] 使用者可以選取群組與股票代號
+- [x] 即時走勢圖可疊加多檔股票
+- [x] 每日 K 線圖可切換股票
+- [x] 支援 Actual Price / Indexed Price 顯示模式
+- [x] 顯示資料更新時間與資料來源
+- [x] 顯示資料過期警示
 
 ## Phase 2 - Data Collector
 
