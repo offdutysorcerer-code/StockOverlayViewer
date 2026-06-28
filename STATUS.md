@@ -8,7 +8,7 @@ This file is the live coordination board for multi-agent collaboration. It stays
 
 | Agent | Status | Files / Area | Notes |
 |---|---|---|---|
-| LM Studio | IDLE | `scripts/`, `data/`, `docs/Contract.md` | Waiting for next task. |
+| LM Studio | ONBOARDING | `AGENTS.md`, `STATUS.md`, `PROJECT_STATE.md`, `docs/Contract.md` | Read onboarding files. Confirmed Git workflow and contract rules. Ready for task assignment. |
 | ChatGPT | DONE | `AGENTS.md`, `PROJECT_STATE.md`, docs index | Added explicit onboarding entry for new collaborators. |
 | Human | REVIEW | onboarding flow, Git branch | Review `AGENTS.md` and onboarding instructions before merge. |
 
