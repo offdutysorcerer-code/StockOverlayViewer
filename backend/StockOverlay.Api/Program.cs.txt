@@ -1,0 +1,97 @@
+using System.Text.Json;
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
+var app = builder.Build();
+
+app.UseCors();
+
+app.MapGet("/api/health", () => Results.Ok(new
+{
+    status = "ok",
+    service = "StockOverlay.Api",
+    timestamp = DateTimeOffset.Now
+}));
+
+app.MapGet("/api/groups", () =>
+{
+    var groups = new[]
+    {
+        new StockGroup("semiconductor-core", "半導體核心", new[] { "2330", "2454", "2303", "3034" }, "晶圓代工、IC 設計與半導體核心權值"),
+        new StockGroup("ai-server", "AI 伺服器", new[] { "2382", "3231", "6669", "2356", "2308" }, "AI 伺服器、機殼、電源與相關供應鏈"),
+        new StockGroup("passive-components", "被動元件", new[] { "2327", "2492", "3026", "8043" }, "MLCC、電阻、電感與被動元件族群"),
+        new StockGroup("power-semiconductor", "功率半導體", new[] { "2481", "5425", "3016", "8261" }, "功率半導體與相關元件")
+    };
+
+    return Results.Ok(groups);
+});
+
+app.MapGet("/api/stocks/{symbol}/intraday", (string symbol) =>
+{
+    var seed = ExtractSeed(symbol);
+    var basePrice = 50 + seed % 900;
+    var points = Enumerable.Range(0, 60)
+        .Select(i =>
+        {
+            var time = new TimeOnly(9, 0).AddMinutes(i * 5);
+            var price = Math.Round(basePrice + Math.Sin(i / 5.0 + seed) * 5 + i * 0.08, 2);
+            return new IntradayPoint(time.ToString("HH:mm:ss"), price, 100 + Math.Abs(seed * (i + 1)) % 2000);
+        })
+        .ToArray();
+
+    return Results.Ok(new IntradayResponse(
+        symbol,
+        DateOnly.FromDateTime(DateTime.Today).ToString("yyyy-MM-dd"),
+        points,
+        "backend-mock",
+        DateTimeOffset.Now
+    ));
+});
+
+app.MapGet("/api/stocks/{symbol}/daily", (string symbol) =>
+{
+    var seed = ExtractSeed(symbol);
+    var basePrice = 50 + seed % 900;
+    var candles = Enumerable.Range(0, 60)
+        .Select(index =>
+        {
+            var i = 59 - index;
+            var date = DateOnly.FromDateTime(DateTime.Today.AddDays(-i));
+            var close = basePrice + Math.Sin(i / 4.0 + seed) * 8 + (60 - i) * 0.12;
+            return new DailyCandle(
+                date.ToString("yyyy-MM-dd"),
+                Math.Round(close - 1, 2),
+                Math.Round(close + 3, 2),
+                Math.Round(close - 4, 2),
+                Math.Round(close, 2),
+                5000 + Math.Abs(seed * (i + 3)) % 50000
+            );
+        })
+        .ToArray();
+
+    return Results.Ok(new DailyResponse(symbol, candles, "backend-mock", DateTimeOffset.Now));
+});
+
+app.Run();
+
+static int ExtractSeed(string symbol)
+{
+    var digits = new string(symbol.Where(char.IsDigit).ToArray());
+    return int.TryParse(digits, out var seed) ? seed : 1000;
+}
+
+public record StockGroup(string Id, string Name, string[] Symbols, string Description);
+public record IntradayPoint(string Time, double Price, int Volume);
+public record IntradayResponse(string Symbol, string Date, IntradayPoint[] Points, string Source, DateTimeOffset UpdatedAt);
+public record DailyCandle(string Date, double Open, double High, double Low, double Close, int Volume);
+public record DailyResponse(string Symbol, DailyCandle[] Candles, string Source, DateTimeOffset UpdatedAt);

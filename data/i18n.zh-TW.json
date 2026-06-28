@@ -1,0 +1,10 @@
+{
+  "group.semiconductorCore": "Semiconductor Core",
+  "group.semiconductorCore.description": "Foundry, IC design, and core semiconductor large caps",
+  "group.aiServer": "AI Server",
+  "group.aiServer.description": "AI server and related supply chain",
+  "group.passiveComponents": "Passive Components",
+  "group.passiveComponents.description": "MLCC, resistor, inductor, and passive component names",
+  "group.powerSemiconductor": "Power Semiconductor",
+  "group.powerSemiconductor.description": "Power semiconductor and related component names"
+}

@@ -1,26 +1,77 @@
-# Data Contract (數據契約)
+# Data Contract
 
-本文件定義 `StockOverlayViewer` 專案中前後端交換的 JSON 格式。
-**請雙方 AI 務必遵守此格式，以免產生串接錯誤。**
+This is the canonical data contract for StockOverlayViewer.
+All agents must update this file before changing JSON shapes, API payloads, or file paths.
 
-## 1. `data/groups.json` (群組設定)
+## Canonical rules
+
+- JSON files must be UTF-8 without BOM.
+- Stock symbols are plain strings, for example `2330`.
+- Generated runtime quote files must not be treated as source code.
+- Frontend readers must tolerate optional fields, but writers must follow this contract.
+
+## data/groups.json
+
+Current canonical shape is a top-level array, not an object wrapper.
+
+```json
+[
+  {
+    "id": "semiconductor-core",
+    "name": "Semiconductor Core",
+    "displayNameKey": "group.semiconductorCore",
+    "symbols": ["2330", "2454", "2303", "3034"],
+    "descriptionKey": "group.semiconductorCore.description"
+  }
+]
+```
+
+Required fields:
+
+- `id`: stable group id.
+- `name`: fallback display name.
+- `symbols`: array of stock symbol strings.
+
+Optional fields:
+
+- `displayNameKey`
+- `descriptionKey`
+
+## data/symbols.json
+
 ```json
 {
-  "groups": [
-    {
-      "id": "tech",
-      "name": "科技股",
-      "symbols": ["2330", "2454", "3034"]
-    }
-  ]
+  "2330": {
+    "name": "TSMC",
+    "displayName": "台積電",
+    "market": "TWSE",
+    "industry": "Semiconductor",
+    "source": "manual-or-provider",
+    "updatedAt": "2026-06-28T22:00:00+08:00"
+  }
 }
 ```
 
-## 2. `data/latest.json` (即時資料索引)
+Required key:
+
+- top-level key is the stock symbol.
+
+Recommended fields:
+
+- `name`: English or romanized company name.
+- `displayName`: Chinese display name.
+- `market`: `TWSE`, `TPEx`, `ETF`, or `unknown`.
+- `industry`
+- `source`
+- `updatedAt`
+
+## data/latest.json
+
 ```json
 {
-  "updatedAt": "2026-06-28T21:30:00+08:00",
+  "updatedAt": "2026-06-28T22:14:07+08:00",
   "mode": "mock",
+  "iteration": 55,
   "symbols": {
     "2330": {
       "intraday": "data/intraday/2330.json",
@@ -31,23 +82,85 @@
 }
 ```
 
-## 3. `data/intraday/{symbol}.json` (即時走勢)
+## data/intraday/{symbol}.json
+
 ```json
 {
   "symbol": "2330",
-  "data": [
-    { "time": "09:00", "price": 200.0 },
-    { "time": "09:01", "price": 200.5 }
-  ]
+  "date": "2026-06-28",
+  "iteration": 3,
+  "simulatedTime": "09:10:00",
+  "isComplete": false,
+  "points": [
+    { "time": "09:00:00", "price": 575.98, "volume": 580 },
+    { "time": "09:05:00", "price": 576.64, "volume": 910 }
+  ],
+  "source": "mock-powershell-progressive",
+  "updatedAt": "2026-06-28T22:14:07+08:00"
 }
 ```
 
-## 4. `data/daily/{symbol}.json` (每日 K 線)
+Required fields:
+
+- `symbol`
+- `points`
+- `source`
+- `updatedAt`
+
+Point fields:
+
+- `time`: `HH:mm:ss`
+- `price`: number
+- `volume`: number
+
+## data/daily/{symbol}.json
+
 ```json
 {
   "symbol": "2330",
-  "data": [
-    { "date": "2026-06-27", "open": 198, "high": 202, "low": 197, "close": 200, "volume": 50000 }
-  ]
+  "candles": [
+    {
+      "date": "2026-06-26",
+      "open": 1015,
+      "high": 1025,
+      "low": 1008,
+      "close": 1020,
+      "volume": 63000
+    }
+  ],
+  "source": "sample",
+  "updatedAt": "2026-06-28T00:00:00+08:00"
 }
 ```
+
+Required fields:
+
+- `symbol`
+- `candles`
+- `source`
+- `updatedAt`
+
+## Local server API
+
+Current local server is `scripts/StartFrontend.ps1`.
+
+```text
+GET  /api/symbols/lookup?symbol=2330
+POST /api/groups/save
+POST /api/symbols/save
+POST /api/collector/start?intervalSeconds=2&durationSeconds=60
+POST /api/collector/stop
+GET  /api/collector/status
+```
+
+## Deprecated draft shapes
+
+The earlier LM Studio draft used:
+
+```json
+{ "groups": [] }
+```
+
+and intraday/daily arrays named `data`.
+
+Those shapes are deprecated. Agents must use the current canonical shapes above unless this file is updated first.

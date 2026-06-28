@@ -1,0 +1,22 @@
+# Runtime quote output
+data/intraday/*.json
+data/daily/*.json
+data/latest.json
+data/collector.pid
+
+# Logs and temp files
+logs/
+*.log
+*.tmp
+*.bak
+
+# Local editor files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Optional build outputs
+backend/**/bin/
+backend/**/obj/
+node_modules/

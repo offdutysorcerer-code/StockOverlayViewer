@@ -1,0 +1,52 @@
+[
+    {
+        "id":  "semiconductor-core",
+        "name":  "Semiconductor Core",
+        "displayNameKey":  "group.semiconductorCore",
+        "symbols":  [
+                        "2330",
+                        "2454",
+                        "2303",
+                        "3034",
+                        "2498"
+                    ],
+        "descriptionKey":  "group.semiconductorCore.description"
+    },
+    {
+        "id":  "ai-server",
+        "name":  "AI Server",
+        "displayNameKey":  "group.aiServer",
+        "symbols":  [
+                        "2382",
+                        "3231",
+                        "6669",
+                        "2356",
+                        "2308"
+                    ],
+        "descriptionKey":  "group.aiServer.description"
+    },
+    {
+        "id":  "passive-components",
+        "name":  "Passive Components",
+        "displayNameKey":  "group.passiveComponents",
+        "symbols":  [
+                        "2327",
+                        "2492",
+                        "3026",
+                        "8043"
+                    ],
+        "descriptionKey":  "group.passiveComponents.description"
+    },
+    {
+        "id":  "power-semiconductor",
+        "name":  "Power Semiconductor",
+        "displayNameKey":  "group.powerSemiconductor",
+        "symbols":  [
+                        "2481",
+                        "5425",
+                        "3016",
+                        "8261"
+                    ],
+        "descriptionKey":  "group.powerSemiconductor.description"
+    }
+]
