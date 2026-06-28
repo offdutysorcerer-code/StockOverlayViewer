@@ -19,6 +19,8 @@ const el = {
   stopFeedButton: document.getElementById("stopFeedButton"),
   addGroupButton: document.getElementById("addGroupButton"),
   addSymbolButton: document.getElementById("addSymbolButton"),
+  importSymbolButton: document.getElementById("importSymbolButton"),
+  symbolFileInput: document.getElementById("symbolFileInput"),
   priceModeSelect: document.getElementById("priceModeSelect"),
   intradayChart: document.getElementById("intradayChart"),
   dailyChart: document.getElementById("dailyChart"),
@@ -35,6 +37,8 @@ async function init() {
   el.stopFeedButton.addEventListener("click", stopFeedFromUi);
   el.addGroupButton.addEventListener("click", addGroup);
   el.addSymbolButton.addEventListener("click", addSymbol);
+  el.importSymbolButton.addEventListener("click", () => el.symbolFileInput.click());
+  el.symbolFileInput.addEventListener("change", importSymbolsFromFile);
   el.priceModeSelect.addEventListener("change", async (event) => {
     state.priceMode = event.target.value;
     await refreshCharts();
@@ -195,4 +199,71 @@ function formatTime(value) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleTimeString("zh-TW", { hour12: false });
+}
+
+
+async function importSymbolsFromFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  try {
+    let content = await file.text();
+    
+    // Try to parse as JSON first
+    let importedSymbols = {};
+    try {
+      importedSymbols = JSON.parse(content);
+    } catch (jsonError) {
+      // Parse CSV format
+      const lines = content.split('\n').filter(line => line.trim() !== '');
+      if (lines.length > 0) {
+        // Assume first row is header
+        const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+        
+        let codeIdx = -1, nameIdx = -1;
+        for (let i = 0; i < headers.length; i++) {
+          if (headers[i].match(/代號|code|stock.*code/)) codeIdx = i;
+          if (headers[i].match(/名稱|name|stock.*name/)) nameIdx = i;
+        }
+        
+        // Fallback: assume first column is code, second is name
+        if (codeIdx === -1) codeIdx = 0;
+        if (nameIdx === -1) nameIdx = 1;
+        
+        for (let i = 1; i < lines.length; i++) {
+          const parts = lines[i].split(',');
+          if (parts[codeIdx]?.trim()) {
+            const code = parts[codeIdx].trim();
+            const name = parts[nameIdx]?.trim() || code;
+            importedSymbols[code] = { name, displayName: name };
+          }
+        }
+      }
+    }
+
+    // Merge with existing symbols
+    state.symbolsMeta = { ...state.symbolsMeta, ...importedSymbols };
+    
+    // Try to save via API
+    try {
+      await saveSymbolsMeta(state.symbolsMeta);
+      alert(`Successfully imported ${Object.keys(importedSymbols).length} symbols!`);
+    } catch (apiError) {
+      console.warn("Failed to save via API:", apiError);
+      
+      // Fallback: show instructions for manual update
+      const jsonStr = JSON.stringify(state.symbolsMeta, null, 2);
+      alert(`Imported ${Object.keys(importedSymbols).length} symbols. Please copy the following content to data/symbols.json:\n\n${jsonStr.substring(0, 500)}...`);
+    }
+
+    // Refresh UI
+    renderAll();
+    await refreshCharts();
+    
+  } catch (error) {
+    console.error("Import failed:", error);
+    alert(`Import failed: ${error.message}`);
+  } finally {
+    event.target.value = ''; // Reset file input
+  }
 }

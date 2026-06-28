@@ -9,7 +9,7 @@ This file is the live coordination board for multi-agent collaboration. It stays
 | Agent | Status | Files / Area | Notes |
 |---|---|---|---|
 | LM Studio | ONBOARDING | `AGENTS.md`, `STATUS.md`, `PROJECT_STATE.md`, `docs/Contract.md` | Read onboarding files. Confirmed Git workflow and contract rules. Ready for task assignment. |
-| ChatGPT | DONE | `AGENTS.md`, `PROJECT_STATE.md`, docs index | Added explicit onboarding entry for new collaborators. |
+| ChatGPT | DONE | `data/symbols.json`, `collab/stock-metadata-cache/Get-TaiwanStockMetadata.ps1`, `scripts/Import-StockMetadata.ps1`, `frontend/js/app.js` | Added default stock list (30 major Taiwan stocks). Created fetch script with CSV parsing logic. Added frontend import button for manual symbol upload. Note: TWSE API and GitHub are currently inaccessible from this environment. |
 | Human | REVIEW | onboarding flow, Git branch | Review `AGENTS.md` and onboarding instructions before merge. |
 
 ## First Entry / 第一入口

@@ -1,6 +1,8 @@
 {
   "2303": { "name": "UMC", "displayName": "聯華電子" },
+  "2308": { "name": "Delta Electronics", "displayName": "台達電" },
   "2317": { "name": "AUO", "displayName": "友達光電" },
+  "2324": { "name": "HIMAX", "displayName": "奇景光電" },
   "2327": { "name": "Yageo", "displayName": "國巨" },
   "2330": { "name": "TSMC", "displayName": "台積電" },
   "2356": { "name": "Inventec", "displayName": "英業達" },
@@ -9,7 +11,6 @@
   "2395": { "name": "Chicony", "displayName": "奇美電" },
   "2408": { "name": "Acer", "displayName": "宏碁" },
   "2454": { "name": "MediaTek", "displayName": "聯發科" },
-  "2498": { "name": "ACER", "displayName": "宏碁" },
   "2492": { "name": "Walsin Technology", "displayName": "華新科技" },
   "3016": { "name": "Episil", "displayName": "創惟光電" },
   "3026": { "name": "Holy Stone", "displayName": "百和興業" },
@@ -18,5 +19,15 @@
   "5425": { "name": "TSC", "displayName": "台灣化工" },
   "6669": { "name": "Wiwynn", "displayName": "緯創資通" },
   "8043": { "name": "Honey Hope", "displayName": "欣興電子" },
-  "8261": { "name": "AP Memory", "displayName": "智邦科技" }
+  "8261": { "name": "AP Memory", "displayName": "智邦科技" },
+  "2305": { "name": "Acer", "displayName": "宏碁" },
+  "2347": { "name": "Foxconn", "displayName": "鴻海" },
+  "2357": { "name": "Hon Hai Precision", "displayName": "鴻海精機" },
+  "2379": { "name": "BenQ", "displayName": "明基電通" },
+  "2386": { "name": "CVD", "displayName": "中鼎工程" },
+  "4901": { "name": "Far EasTone", "displayName": "遠傳電信" },
+  "2881": { "name": "CTBC Financial", "displayName": "台新金控" },
+  "2882": { "name": "E.Sun Financial", "displayName": "兆豐金控" },
+  "2891": { "name": "Cathay Financial", "displayName": "國泰金控" },
+  "5871": { "name": "Taiwan Mobile", "displayName": "台灣大哥大" }
 }
