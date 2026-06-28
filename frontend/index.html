@@ -59,14 +59,22 @@
       <section class="panel chart-panel daily-panel">
         <div class="panel-header">
           <h2>Daily Chart</h2>
-          <span id="dailyStatus" class="status">Not loaded</span>
+          <div class="daily-controls">
+            <select id="dailySymbolSelect" aria-label="daily chart symbol"></select>
+            <span id="dailyStatus" class="status">Not loaded</span>
+          </div>
         </div>
-        <div id="dailyChart" class="daily-chart-placeholder">Daily chart area.</div>
+        <div class="daily-chart-container">
+          <canvas id="dailyChart"></canvas>
+        </div>
       </section>
     </section>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/luxon"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
   <script type="module" src="./js/app.js"></script>
 </body>
 </html>

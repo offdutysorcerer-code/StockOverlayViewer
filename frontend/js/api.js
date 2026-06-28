@@ -20,7 +20,7 @@ export async function resetGroups() {
 export async function getSymbolsMeta() {
   const fileSymbols = await fetchJson(`${DATA_BASE_URL}/symbols.json`).catch(() => ({}));
   const localSymbols = loadJsonFromStorage(STORAGE_SYMBOLS_KEY) ?? {};
-  return { ...fileSymbols, ...localSymbols, ...getBuiltInChineseSymbolNames() };
+  return { ...getBuiltInChineseSymbolNames(), ...fileSymbols, ...localSymbols };
 }
 
 export async function saveSymbolsMeta(symbolsMeta) {

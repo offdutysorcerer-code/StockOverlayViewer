@@ -1,5 +1,5 @@
 import { getGroups, saveGroups, resetGroups, getIntraday, getDaily, getLatestIndex, getSymbolsMeta, saveSymbolsMeta, lookupSymbol, startMockFeed, stopMockFeed } from "./api.js";
-import { renderIntradayChart, renderDailyPlaceholder } from "./chart.js";
+import { renderIntradayChart, renderDailyChart, clearDailyChart } from "./chart.js";
 import { renderGroups, renderSymbols, getSymbolLabel } from "./groups.js";
 
 const state = {
@@ -7,6 +7,7 @@ const state = {
   symbolsMeta: {},
   selectedGroupId: null,
   selectedSymbols: [],
+  dailySymbol: null,
   priceMode: "indexed"
 };
 
@@ -25,7 +26,8 @@ const el = {
   intradayChart: document.getElementById("intradayChart"),
   dailyChart: document.getElementById("dailyChart"),
   intradayStatus: document.getElementById("intradayStatus"),
-  dailyStatus: document.getElementById("dailyStatus")
+  dailyStatus: document.getElementById("dailyStatus"),
+  dailySymbolSelect: document.getElementById("dailySymbolSelect")
 };
 
 init();
@@ -43,11 +45,16 @@ async function init() {
     state.priceMode = event.target.value;
     await refreshCharts();
   });
+  el.dailySymbolSelect.addEventListener("change", async (event) => {
+    state.dailySymbol = event.target.value;
+    await refreshCharts();
+  });
 
   state.symbolsMeta = await getSymbolsMeta();
   state.groups = await getGroups();
   state.selectedGroupId = state.groups[0]?.id ?? null;
   state.selectedSymbols = state.groups[0]?.symbols.slice(0, 3) ?? [];
+  state.dailySymbol = state.selectedSymbols[0] ?? null;
 
   renderAll();
   await refreshCharts();
@@ -56,10 +63,12 @@ async function init() {
 
 function renderAll() {
   const group = getSelectedGroup();
+  renderDailySymbolOptions(group?.symbols ?? []);
   renderGroups(el.groupList, state.groups, state.selectedGroupId, {
     onSelectGroup: async (groupId) => {
       state.selectedGroupId = groupId;
       state.selectedSymbols = getSelectedGroup()?.symbols.slice(0, 3) ?? [];
+      state.dailySymbol = state.selectedSymbols[0] ?? null;
       renderAll();
       await refreshCharts();
     },
@@ -71,6 +80,7 @@ function renderAll() {
       state.selectedSymbols = state.selectedSymbols.includes(symbol)
         ? state.selectedSymbols.filter((item) => item !== symbol)
         : [...state.selectedSymbols, symbol];
+      if (!state.dailySymbol) state.dailySymbol = symbol;
       renderAll();
       await refreshCharts();
     },
@@ -92,19 +102,22 @@ async function stopFeedFromUi() {
 
 async function refreshCharts() {
   if (state.selectedSymbols.length === 0) {
-    el.intradayStatus.textContent = "No symbols selected";
-    el.dailyStatus.textContent = "No symbols selected";
-    renderDailyPlaceholder(el.dailyChart, null);
+    clearDailyChart();
+    setStatus(el.intradayStatus, "No symbols selected");
+    setStatus(el.dailyStatus, "No symbols selected");
     return;
   }
   const latest = await getLatestIndex();
   const intradaySeries = await Promise.all(state.selectedSymbols.map((symbol) => getIntraday(symbol)));
   renderIntradayChart(el.intradayChart, intradaySeries, state.priceMode);
   const newestTime = intradaySeries.map((series) => series.updatedAt).filter(Boolean).sort().at(-1);
-  el.intradayStatus.textContent = `Loaded ${state.selectedSymbols.length} | updated ${formatTime(newestTime || latest.updatedAt)}`;
-  const firstDaily = await getDaily(state.selectedSymbols[0]);
-  renderDailyPlaceholder(el.dailyChart, firstDaily);
-  el.dailyStatus.textContent = `Showing ${getSymbolLabel(state.selectedSymbols[0], state.symbolsMeta)} | source ${firstDaily.source ?? "unknown"}`;
+  const intradayUpdatedAt = newestTime || latest.updatedAt;
+  const sources = [...new Set(intradaySeries.map((series) => series.source).filter(Boolean))].join(", ") || latest.mode || "unknown";
+  setStatus(el.intradayStatus, `Loaded ${state.selectedSymbols.length} | source ${sources} | updated ${formatTime(intradayUpdatedAt)}`, intradayUpdatedAt);
+  const dailySymbol = state.dailySymbol || state.selectedSymbols[0];
+  const firstDaily = await getDaily(dailySymbol);
+  renderDailyChart(el.dailyChart, firstDaily);
+  setStatus(el.dailyStatus, `Showing ${getSymbolLabel(dailySymbol, state.symbolsMeta)} | source ${firstDaily.source ?? "unknown"} | updated ${formatTime(firstDaily.updatedAt)}`, firstDaily.updatedAt);
 }
 
 async function addGroup() {
@@ -130,6 +143,7 @@ async function removeGroup(groupId) {
   state.groups = state.groups.filter((item) => item.id !== groupId);
   state.selectedGroupId = state.groups[0]?.id ?? null;
   state.selectedSymbols = getSelectedGroup()?.symbols.slice(0, 3) ?? [];
+  state.dailySymbol = state.selectedSymbols[0] ?? null;
   await saveAndRender();
 }
 
@@ -177,6 +191,7 @@ async function resetAllGroups() {
   state.groups = await resetGroups();
   state.selectedGroupId = state.groups[0]?.id ?? null;
   state.selectedSymbols = state.groups[0]?.symbols.slice(0, 3) ?? [];
+  state.dailySymbol = state.selectedSymbols[0] ?? null;
   renderAll();
   await refreshCharts();
 }
@@ -265,5 +280,33 @@ async function importSymbolsFromFile(event) {
     alert(`Import failed: ${error.message}`);
   } finally {
     event.target.value = ''; // Reset file input
+  }
+}
+
+
+function renderDailySymbolOptions(symbols) {
+  const available = symbols.filter((symbol) => state.selectedSymbols.includes(symbol));
+  if (!available.includes(state.dailySymbol)) {
+    state.dailySymbol = available[0] ?? null;
+  }
+  el.dailySymbolSelect.innerHTML = "";
+  available.forEach((symbol) => {
+    const option = document.createElement("option");
+    option.value = symbol;
+    option.textContent = getSymbolLabel(symbol, state.symbolsMeta);
+    option.selected = symbol === state.dailySymbol;
+    el.dailySymbolSelect.appendChild(option);
+  });
+  el.dailySymbolSelect.disabled = available.length === 0;
+}
+
+function setStatus(element, message, updatedAt = null) {
+  element.textContent = message;
+  element.classList.remove("stale", "error");
+  if (!updatedAt) return;
+  const timestamp = new Date(updatedAt).getTime();
+  if (!Number.isNaN(timestamp) && Date.now() - timestamp > 15 * 60 * 1000) {
+    element.textContent += " | stale";
+    element.classList.add("stale");
   }
 }

@@ -71,29 +71,38 @@ function Find-Value($Object, [string[]]$Names) {
 }
 
 function Lookup-Symbol([string]$Symbol) {
-  $sources = @(
-    @{ market = "TWSE"; url = "https://openapi.twse.com.tw/v1/opendata/t187ap03_L" },
-    @{ market = "TPEx"; url = "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap03_O" }
-  )
-  foreach ($source in $sources) {
+  $normalized = $Symbol.Trim().ToUpperInvariant()
+  if (Test-Path $symbolsPath) {
     try {
-      $rows = Invoke-RestMethod -Uri $source.url -Method Get -TimeoutSec 10
-      foreach ($row in $rows) {
-        $code = Find-Value $row @("公司代號", "有價證券代號", "股票代號")
-        if ($code -eq $Symbol) {
-          return [ordered]@{
-            symbol = $Symbol
-            displayName = Find-Value $row @("公司名稱", "公司簡稱", "有價證券名稱")
-            name = Find-Value $row @("英文簡稱", "英文名稱")
-            market = $source.market
-            source = $source.url
-            updatedAt = (Get-Date).ToString("o")
-          }
+      $json = [System.IO.File]::ReadAllText($symbolsPath, [System.Text.Encoding]::UTF8)
+      $symbols = $json | ConvertFrom-Json
+      $property = $symbols.PSObject.Properties[$normalized]
+      if ($null -ne $property) {
+        $item = $property.Value
+        return [ordered]@{
+          symbol = $normalized
+          displayName = "$($item.displayName)"
+          name = "$($item.name)"
+          market = "$($item.market)"
+          industry = "$($item.industry)"
+          source = "$($item.source)"
+          updatedAt = "$($item.updatedAt)"
         }
       }
-    } catch {}
+    }
+    catch {
+      Write-Warning "Failed to read local symbol metadata: $($_.Exception.Message)"
+    }
   }
-  return [ordered]@{ symbol = $Symbol; displayName = ""; name = ""; market = "unknown"; source = "not-found"; updatedAt = (Get-Date).ToString("o") }
+
+  return [ordered]@{
+    symbol = $normalized
+    displayName = ""
+    name = ""
+    market = "unknown"
+    source = "not-found"
+    updatedAt = (Get-Date).ToString("o")
+  }
 }
 
 function Get-CollectorProcess() {

@@ -1,4 +1,5 @@
 let intradayChart;
+let dailyChart;
 
 const FULL_INTRADAY_LABELS = createFullIntradayLabels();
 
@@ -7,11 +8,10 @@ export function renderIntradayChart(canvas, seriesList, priceMode) {
     const prices = series.points.map((point) => point.price);
     const normalized = normalizeToBase100(prices);
     const values = priceMode === "indexed" ? normalized : prices;
-    const aligned = alignToFullLabels(series.points, values);
 
     return {
       label: series.symbol,
-      data: aligned,
+      data: alignToFullLabels(series.points, values),
       tension: 0,
       pointRadius: 0,
       borderWidth: 2,
@@ -22,35 +22,70 @@ export function renderIntradayChart(canvas, seriesList, priceMode) {
   if (!intradayChart) {
     intradayChart = new Chart(canvas, {
       type: "line",
-      data: {
-        labels: FULL_INTRADAY_LABELS,
-        datasets
-      },
+      data: { labels: FULL_INTRADAY_LABELS, datasets },
       options: createChartOptions()
     });
     return;
   }
 
-  intradayChart.data.labels = FULL_INTRADAY_LABELS;
   intradayChart.data.datasets = datasets;
   intradayChart.update("none");
 }
 
-export function renderDailyPlaceholder(container, dailyData) {
-  if (!dailyData) {
-    container.textContent = "請先選擇股票。";
+export function renderDailyChart(canvas, dailyData) {
+  const candles = dailyData?.candles ?? [];
+  const data = candles.map((candle) => ({
+    x: candle.date,
+    o: Number(candle.open),
+    h: Number(candle.high),
+    l: Number(candle.low),
+    c: Number(candle.close)
+  }));
+
+  if (!dailyChart) {
+    dailyChart = new Chart(canvas, {
+      type: "candlestick",
+      data: {
+        datasets: [{
+          label: dailyData?.symbol ?? "Daily",
+          data,
+          color: {
+            up: "#ef4444",
+            down: "#22c55e",
+            unchanged: "#94a3b8"
+          }
+        }]
+      },
+      options: {
+        ...createChartOptions(),
+        parsing: false,
+        scales: {
+          x: {
+            type: "time",
+            time: { unit: "day", tooltipFormat: "yyyy-MM-dd" },
+            ticks: { color: "#9ca3af", maxRotation: 0 },
+            grid: { color: "#374151" }
+          },
+          y: {
+            position: "right",
+            ticks: { color: "#9ca3af" },
+            grid: { color: "#374151" }
+          }
+        }
+      }
+    });
     return;
   }
 
-  const latest = dailyData.candles[dailyData.candles.length - 1];
-  container.innerHTML = `
-    <div>
-      <strong>${dailyData.symbol}</strong><br />
-      最新日 K：${latest.date}<br />
-      O ${latest.open} / H ${latest.high} / L ${latest.low} / C ${latest.close}<br />
-      <small>下一步可接 Lightweight Charts 顯示正式 K 線。</small>
-    </div>
-  `;
+  dailyChart.data.datasets[0].label = dailyData?.symbol ?? "Daily";
+  dailyChart.data.datasets[0].data = data;
+  dailyChart.update("none");
+}
+
+export function clearDailyChart() {
+  if (!dailyChart) return;
+  dailyChart.data.datasets[0].data = [];
+  dailyChart.update("none");
 }
 
 function createFullIntradayLabels() {
@@ -67,10 +102,7 @@ function createFullIntradayLabels() {
 
 function alignToFullLabels(points, values) {
   const map = new Map();
-  points.forEach((point, index) => {
-    map.set(point.time, values[index]);
-  });
-
+  points.forEach((point, index) => map.set(point.time, values[index]));
   return FULL_INTRADAY_LABELS.map((label) => map.get(label) ?? null);
 }
 
@@ -79,23 +111,9 @@ function createChartOptions() {
     responsive: true,
     maintainAspectRatio: false,
     animation: false,
-    animations: false,
-    transitions: {
-      active: { animation: { duration: 0 } },
-      resize: { animation: { duration: 0 } },
-      show: { animation: { duration: 0 } },
-      hide: { animation: { duration: 0 } }
-    },
-    interaction: {
-      mode: "index",
-      intersect: false
-    },
+    interaction: { mode: "index", intersect: false },
     plugins: {
-      legend: {
-        labels: {
-          color: "#e5e7eb"
-        }
-      }
+      legend: { labels: { color: "#e5e7eb" } }
     },
     scales: {
       x: {
