@@ -6,11 +6,17 @@
 
 param(
     [string]$FilePath,
-    [string]$JsonFile
+    [string]$JsonFile,
+    [string]$OutputFile
 )
 
 $projectRoot = "D:\MarketResearch\Apps\StockOverlayViewer"
-$outputFile = Join-Path $projectRoot "data\symbols.json"
+if ([string]::IsNullOrWhiteSpace($OutputFile)) {
+    $OutputFile = Join-Path $projectRoot "data\symbols.json"
+} elseif (-not [System.IO.Path]::IsPathRooted($OutputFile)) {
+    $OutputFile = Join-Path (Get-Location) $OutputFile
+}
+$outputFile = [System.IO.Path]::GetFullPath($OutputFile)
 
 if (-not $FilePath -and -not $JsonFile) {
     Write-Host "Usage:" -ForegroundColor Cyan
