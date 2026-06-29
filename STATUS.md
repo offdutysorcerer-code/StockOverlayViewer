@@ -9,8 +9,8 @@ This file is the live coordination board for multi-agent collaboration. It stays
 | Agent | Status | Files / Area | Notes |
 |---|---|---|---|
 | LM Studio | ONBOARDING | `AGENTS.md`, `STATUS.md`, `PROJECT_STATE.md`, `docs/Contract.md` | Read onboarding files. Confirmed Git workflow and contract rules. Ready for task assignment. |
-| ChatGPT | REVIEW | `frontend/js/chart.js`, `STATUS.md` | Fixed frontend chart rendering for sparse TWSE intraday points and daily candle timestamps. Browser-module syntax check passed by copying chart.js to a temporary `.mjs` file and running `node --check`. |
-| ChatGPT | 檢視 | `frontend/js/chart.js`, `STATUS.md` | 已修正前端圖表渲染：TWSE 即時資料點位稀疏時會顯示點並允許跨空白時間連線，Daily candles 的日期改以 timestamp 餵給圖表。已將 chart.js 複製為暫存 `.mjs` 並通過 `node --check`。 |
+| ChatGPT | REVIEW | `scripts/FetchIntraday.Twse.ps1`, `frontend/index.html`, `frontend/js/api.js`, `frontend/js/app.js`, `STATUS.md` | Cleaned TWSE intraday session handling so a new collector run does not carry over mock or stale points. Added a provider selector to the UI so Start Feed can launch either `twse` or `mock`. Syntax checks passed, and `twse -Once` now leaves 2330 with one clean real MIS point instead of a mixed mock/TWSE line. |
+| ChatGPT | 檢視 | `scripts/FetchIntraday.Twse.ps1`, `frontend/index.html`, `frontend/js/api.js`, `frontend/js/app.js`, `STATUS.md` | 已修正 TWSE intraday session 處理，新 collector 執行不再沿用 mock 或舊點位。前端新增 provider 選單，Start Feed 可啟動 `twse` 或 `mock`。語法檢查通過，且 `twse -Once` 後 2330 只留下乾淨的真實 MIS 點，不再混成 mock/TWSE 假斜線。 |
 | Human | REVIEW | onboarding flow, Git branch | Review `AGENTS.md` and onboarding instructions before merge. |
 
 ## First Entry / 第一入口

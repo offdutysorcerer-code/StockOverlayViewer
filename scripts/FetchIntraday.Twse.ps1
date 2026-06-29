@@ -85,12 +85,14 @@ function Invoke-JsonGet([string]$Uri) {
   return Invoke-RestMethod -Uri $Uri -Headers $headers -Method Get -TimeoutSec 20
 }
 
-function Get-ExistingPoints([string]$Path, [string]$Date) {
+function Get-ExistingPoints([string]$Path, [string]$Date, [int]$CurrentIteration) {
+  if ($CurrentIteration -le 1) { return @() }
   if (!(Test-Path $Path)) { return @() }
 
   try {
     $existing = Read-JsonFileUtf8 $Path
     if ($existing.date -ne $Date) { return @() }
+    if ($existing.source -ne "twse-mis") { return @() }
     return @($existing.points)
   }
   catch {
@@ -144,7 +146,7 @@ $currentPoint = [ordered]@{
 }
 
 $pointsByTime = [ordered]@{}
-foreach ($point in (Get-ExistingPoints -Path $OutputPath -Date $date)) {
+foreach ($point in (Get-ExistingPoints -Path $OutputPath -Date $date -CurrentIteration $Iteration)) {
   if ($null -ne $point -and ![string]::IsNullOrWhiteSpace([string]$point.time)) {
     $pointsByTime[[string]$point.time] = [ordered]@{
       time = [string]$point.time

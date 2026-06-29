@@ -16,6 +16,7 @@ const el = {
   symbolList: document.getElementById("symbolList"),
   refreshButton: document.getElementById("refreshButton"),
   resetGroupsButton: document.getElementById("resetGroupsButton"),
+  providerSelect: document.getElementById("providerSelect"),
   startFeedButton: document.getElementById("startFeedButton"),
   stopFeedButton: document.getElementById("stopFeedButton"),
   addGroupButton: document.getElementById("addGroupButton"),
@@ -89,15 +90,18 @@ function renderAll() {
 }
 
 async function startFeedFromUi() {
-  el.intradayStatus.textContent = "Starting mock feed...";
-  const result = await startMockFeed(2, 60);
-  el.intradayStatus.textContent = `Mock feed ${result.status} | pid ${result.pid ?? "-"}`;
+  const provider = el.providerSelect.value === "twse" ? "twse" : "mock";
+  const intervalSeconds = provider === "twse" ? 10 : 2;
+  const durationSeconds = provider === "twse" ? 300 : 60;
+  el.intradayStatus.textContent = `Starting ${provider} feed...`;
+  const result = await startMockFeed(intervalSeconds, durationSeconds, provider);
+  el.intradayStatus.textContent = `${provider} feed ${result.status} | pid ${result.pid ?? "-"}`;
   setTimeout(refreshCharts, 1000);
 }
 
 async function stopFeedFromUi() {
   const result = await stopMockFeed();
-  el.intradayStatus.textContent = `Mock feed ${result.status}`;
+  el.intradayStatus.textContent = `Feed ${result.status}`;
 }
 
 async function refreshCharts() {

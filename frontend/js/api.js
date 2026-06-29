@@ -36,8 +36,9 @@ export async function lookupSymbol(symbol) {
   return await response.json();
 }
 
-export async function startMockFeed(intervalSeconds = 2, durationSeconds = 60) {
-  return await postJson(`/api/collector/start?intervalSeconds=${intervalSeconds}&durationSeconds=${durationSeconds}`, {});
+export async function startMockFeed(intervalSeconds = 2, durationSeconds = 60, provider = "mock") {
+  const normalizedProvider = provider === "twse" ? "twse" : "mock";
+  return await postJson(`/api/collector/start?intervalSeconds=${intervalSeconds}&durationSeconds=${durationSeconds}&provider=${normalizedProvider}`, {});
 }
 
 export async function stopMockFeed() {

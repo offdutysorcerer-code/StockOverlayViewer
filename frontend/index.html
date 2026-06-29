@@ -13,7 +13,11 @@
       <p>Group stocks and compare intraday and daily charts.</p>
     </div>
     <div class="toolbar">
-      <button id="startFeedButton">Start Mock Feed</button>
+      <select id="providerSelect" aria-label="quote provider">
+        <option value="twse">TWSE Feed</option>
+        <option value="mock">Mock Feed</option>
+      </select>
+      <button id="startFeedButton">Start Feed</button>
       <button id="stopFeedButton">Stop Feed</button>
       <button id="refreshButton">Refresh</button>
       <button id="resetGroupsButton">Reset Groups</button>
