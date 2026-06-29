@@ -118,10 +118,10 @@ function Get-CollectorProcess() {
   }
 }
 
-function Start-Collector([int]$IntervalSeconds, [int]$DurationSeconds) {
+function Start-Collector([int]$IntervalSeconds, [int]$DurationSeconds, [string]$Provider) {
   $existing = Get-CollectorProcess
   if ($null -ne $existing) {
-    return [ordered]@{ status = "already-running"; pid = $existing.Id; intervalSeconds = $IntervalSeconds; durationSeconds = $DurationSeconds }
+    return [ordered]@{ status = "already-running"; pid = $existing.Id; provider = $Provider; intervalSeconds = $IntervalSeconds; durationSeconds = $DurationSeconds }
   }
 
   $collectorScript = Join-Path $PSScriptRoot "StartDataCollector.ps1"
@@ -130,14 +130,14 @@ function Start-Collector([int]$IntervalSeconds, [int]$DurationSeconds) {
     "-NoProfile",
     "-ExecutionPolicy", "Bypass",
     "-File", $collectorScript,
-    "-Mock",
+    "-Provider", $Provider,
     "-IntervalSeconds", $IntervalSeconds,
     "-DurationSeconds", $DurationSeconds
   )
 
   $process = Start-Process -FilePath "powershell.exe" -ArgumentList $args -WorkingDirectory $root -PassThru -WindowStyle Minimized
   [System.IO.File]::WriteAllText($collectorPidPath, "$($process.Id)", [System.Text.Encoding]::ASCII)
-  return [ordered]@{ status = "started"; pid = $process.Id; intervalSeconds = $IntervalSeconds; durationSeconds = $DurationSeconds; updatedAt = (Get-Date).ToString("o") }
+  return [ordered]@{ status = "started"; pid = $process.Id; provider = $Provider; intervalSeconds = $IntervalSeconds; durationSeconds = $DurationSeconds; updatedAt = (Get-Date).ToString("o") }
 }
 
 function Stop-Collector() {
@@ -185,7 +185,14 @@ function Handle-Api($Context) {
     $duration = [int]$durationText
     if ($interval -lt 1) { $interval = 1 }
     if ($duration -lt 1) { $duration = 60 }
-    Write-JsonResponse $Context 200 (Start-Collector $interval $duration)
+    $provider = $Context.Request.QueryString["provider"]
+    if ([string]::IsNullOrWhiteSpace($provider)) { $provider = "mock" }
+    $provider = $provider.Trim().ToLowerInvariant()
+    if (@("mock", "twse") -notcontains $provider) {
+      Write-JsonResponse $Context 400 @{ error = "UnsupportedProvider"; message = "provider must be mock or twse"; provider = $provider }
+      return $true
+    }
+    Write-JsonResponse $Context 200 (Start-Collector $interval $duration $provider)
     return $true
   }
 

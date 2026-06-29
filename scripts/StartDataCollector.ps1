@@ -1,5 +1,7 @@
 param(
   [switch]$Mock,
+  [ValidateSet("mock", "twse")]
+  [string]$Provider = "mock",
   [int]$IntervalSeconds = 10,
   [int]$DurationSeconds = 0,
   [switch]$Once
@@ -34,13 +36,48 @@ function Write-JsonFileUtf8([string]$Path, $Value) {
   [System.IO.File]::WriteAllText($Path, $json, $utf8NoBom)
 }
 
+function Resolve-ProviderName {
+  if ($Mock) { return "mock" }
+  return $Provider.ToLowerInvariant()
+}
+
+function Get-ProviderScript {
+  param(
+    [Parameter(Mandatory = $true)]
+    [ValidateSet("Intraday", "Daily")]
+    [string]$Kind,
+
+    [Parameter(Mandatory = $true)]
+    [string]$ProviderName
+  )
+
+  $scriptName = switch ($ProviderName) {
+    "mock" { "Fetch$Kind.Mock.ps1" }
+    "twse" { "Fetch$Kind.Twse.ps1" }
+    default { throw "Unsupported provider: $ProviderName" }
+  }
+
+  $scriptPath = Join-Path $PSScriptRoot $scriptName
+  if (!(Test-Path $scriptPath)) {
+    throw "Provider script not implemented yet: $scriptName"
+  }
+
+  return $scriptPath
+}
+
+$providerName = Resolve-ProviderName
+$intradayProviderScript = Get-ProviderScript -Kind "Intraday" -ProviderName $providerName
+$dailyProviderScript = Get-ProviderScript -Kind "Daily" -ProviderName $providerName
+
 $groups = Read-JsonFileUtf8 $groupsPath
 $symbols = @($groups | ForEach-Object { $_.symbols } | Sort-Object -Unique)
 $startedAt = Get-Date
 $iteration = 0
 
 Write-Host "StockOverlayViewer data collector" -ForegroundColor Cyan
-Write-Host "Mode: $(if ($Mock) { 'mock' } else { 'real provider not implemented, fallback mock' })"
+Write-Host "Provider: $providerName"
+Write-Host "Intraday script: $([System.IO.Path]::GetFileName($intradayProviderScript))"
+Write-Host "Daily script: $([System.IO.Path]::GetFileName($dailyProviderScript))"
 Write-Host "Symbols: $($symbols -join ', ')"
 Write-Host "IntervalSeconds: $IntervalSeconds"
 if ($DurationSeconds -gt 0) { Write-Host "DurationSeconds: $DurationSeconds" }
@@ -57,22 +94,22 @@ function Update-Once {
     $intradayFile = Join-Path $intradayPath "$symbol.json"
     $dailyFile = Join-Path $dailyPath "$symbol.json"
 
-    & (Join-Path $PSScriptRoot "FetchIntraday.Mock.ps1") -Symbol $symbol -OutputPath $intradayFile -Iteration $Iteration
+    & $intradayProviderScript -Symbol $symbol -OutputPath $intradayFile -Iteration $Iteration
 
-    if (!(Test-Path $dailyFile)) {
-      & (Join-Path $PSScriptRoot "FetchDaily.Mock.ps1") -Symbol $symbol -OutputPath $dailyFile
+    if (!(Test-Path $dailyFile) -or $Once) {
+      & $dailyProviderScript -Symbol $symbol -OutputPath $dailyFile
     }
 
     $symbolIndex[$symbol] = [ordered]@{
       intraday = "data/intraday/$symbol.json"
       daily = "data/daily/$symbol.json"
-      status = "mock"
+      status = $providerName
     }
   }
 
   $latest = [ordered]@{
     updatedAt = (Get-Date).ToString("o")
-    mode = "mock"
+    mode = $providerName
     iteration = $Iteration
     symbols = $symbolIndex
   }

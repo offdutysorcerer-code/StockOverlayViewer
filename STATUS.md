@@ -9,8 +9,8 @@ This file is the live coordination board for multi-agent collaboration. It stays
 | Agent | Status | Files / Area | Notes |
 |---|---|---|---|
 | LM Studio | ONBOARDING | `AGENTS.md`, `STATUS.md`, `PROJECT_STATE.md`, `docs/Contract.md` | Read onboarding files. Confirmed Git workflow and contract rules. Ready for task assignment. |
-| ChatGPT | REVIEW | metadata builder/importer, local symbol lookup, intraday mock feed, commit workflow | Built 1,980-symbol cache; fixed Windows PowerShell UTF-8 JSON import; added `Import-StockMetadata.ps1 -OutputFile`; verified local frontend uses `mock-powershell-progressive` intraday data; strengthened bilingual commit title/body format. Daily Chart remains unfinished. Branch: `chatgpt/complete-local-mvp`. |
-| ChatGPT | 檢視 | 股票主檔匯入器、本地代號查詢、盤中 mock feed、提交流程 | 已建立 1,980 筆股票主檔快取；已修正 Windows PowerShell UTF-8 JSON 匯入；已新增 `Import-StockMetadata.ps1 -OutputFile`；已確認本地前端使用 `mock-powershell-progressive` 盤中資料；已強化中英雙語 commit 主題與說明格式。Daily Chart 尚未完成。分支：`chatgpt/complete-local-mvp`。 |
+| ChatGPT | REVIEW | `scripts/StartDataCollector.ps1`, `scripts/StartFrontend.ps1`, provider scripts, `docs/Contract.md` | Added provider switching for collector startup while preserving canonical JSON shapes. `mock` remains default; `twse` provider stubs fail clearly until real TWSE fetch logic is implemented. PowerShell syntax checks passed. Branch creation was blocked by tool safety check, so work stayed on `chatgpt/complete-local-mvp`. |
+| ChatGPT | 檢視 | `scripts/StartDataCollector.ps1`, `scripts/StartFrontend.ps1`, provider 腳本、`docs/Contract.md` | 已新增 collector 啟動時的 provider 切換，並維持正式 JSON 契約。`mock` 仍為預設；`twse` provider 暫以明確錯誤占位，等待後續實作真實 TWSE 抓取邏輯。PowerShell 語法檢查通過。建立新分支被工具安全檢查擋下，因此本次修改保留在 `chatgpt/complete-local-mvp`。 |
 | Human | REVIEW | onboarding flow, Git branch | Review `AGENTS.md` and onboarding instructions before merge. |
 
 ## First Entry / 第一入口
@@ -51,7 +51,7 @@ docs/archive/legacy/README.md     archived legacy docs / 舊文件歸檔
 - 新功能請使用 task branch。
   Use task branches for new work.
 
-- Commit message 必須包含 `[ChatGPT]`, `[LM]`, `[Human]`, or `[Collab]`，且提交主題、tag、說明必須採中英雙語，格式為 `[Agent] 中文主題 / English subject`。
+- Commit message 必須包含 `[ChatGPT]`, `[LM]`, `[Human]`, or `[Collab]`，且提交主題、tag、說明必須採中英雙語，格式為 `[Agent] Chinese subject / English subject`。
   Commit messages must include `[ChatGPT]`, `[LM]`, `[Human]`, or `[Collab]`, and commit subjects, tags, and descriptions must be bilingual in Chinese and English using `[Agent] Chinese subject / English subject`.
 
 ## Current Warnings / 目前注意事項
@@ -64,6 +64,6 @@ docs/archive/legacy/README.md     archived legacy docs / 舊文件歸檔
 
 ## Next Recommended Task / 下一步建議
 
-Evaluate and implement a production quote provider while preserving `docs/Contract.md`.
+Implement the real `twse` provider scripts behind the new provider switch and keep the canonical JSON contract unchanged.
 
-評估並實作正式行情來源，並維持 `docs/Contract.md` 契約。
+在新的 provider 切換架構後方實作真實 `twse` provider 腳本，並維持正式 JSON 契約不變。

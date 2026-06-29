@@ -148,10 +148,17 @@ Current local server is `scripts/StartFrontend.ps1`.
 GET  /api/symbols/lookup?symbol=2330
 POST /api/groups/save
 POST /api/symbols/save
-POST /api/collector/start?intervalSeconds=2&durationSeconds=60
+POST /api/collector/start?intervalSeconds=2&durationSeconds=60&provider=mock
 POST /api/collector/stop
 GET  /api/collector/status
 ```
+
+### Collector provider query
+
+- `provider` is optional and defaults to `mock`.
+- Supported values are currently `mock` and `twse`.
+- `twse` is reserved for the production Taiwan Stock Exchange provider and may return a clear not-implemented error until provider scripts are completed.
+- Provider-specific scripts must still write the canonical `data/intraday/{symbol}.json`, `data/daily/{symbol}.json`, and `data/latest.json` shapes above.
 
 ## Deprecated draft shapes
 
