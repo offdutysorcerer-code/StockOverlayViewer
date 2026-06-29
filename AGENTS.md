@@ -71,14 +71,40 @@ docs/governance/DecisionLog.md
 - 新功能使用 task branch。
   Use a task branch for new work.
 
-- Commit message 必須使用 Agent 前綴，且提交主題、tag、說明應盡量採中英雙語。
-  Commit messages must use an agent prefix, and commit subjects, tags, and descriptions should be bilingual in Chinese and English where practical.
+- Commit message 必須使用 Agent 前綴，且提交主題、tag、說明必須採中英雙語。
+  Commit messages must use an agent prefix, and commit subjects, tags, and descriptions must be bilingual in Chinese and English.
 
 ```text
 [ChatGPT]
 [LM]
 [Human]
 [Collab]
+```
+
+Commit title format / Commit 主題格式：
+
+```text
+[Agent] 中文主題 / English subject
+```
+
+Examples / 範例：
+
+```text
+[ChatGPT] 修正 UTF-8 匯入 / Fix UTF-8 import
+[LM] 新增日 K 圖表 / Add daily candlestick chart
+[Human] 重構前端 API / Refactor frontend API
+```
+
+Commit body format / Commit 說明格式：
+
+```text
+中文：
+- 說明修改內容。
+- 說明測試結果。
+
+English:
+- Describe the changes.
+- Describe test results.
 ```
 
 - 不要提交 runtime 產物。
