@@ -157,7 +157,7 @@ GET  /api/collector/status
 
 - `provider` is optional and defaults to `mock`.
 - Supported values are currently `mock` and `twse`.
-- `twse` is reserved for the production Taiwan Stock Exchange provider and may return a clear not-implemented error until provider scripts are completed.
+- `twse` is the production Taiwan market provider path. Provider scripts must return clear errors when a symbol market or upstream response cannot be handled safely.
 - Provider-specific scripts must still write the canonical `data/intraday/{symbol}.json`, `data/daily/{symbol}.json`, and `data/latest.json` shapes above.
 
 ## Deprecated draft shapes

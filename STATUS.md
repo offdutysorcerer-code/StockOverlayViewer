@@ -9,8 +9,8 @@ This file is the live coordination board for multi-agent collaboration. It stays
 | Agent | Status | Files / Area | Notes |
 |---|---|---|---|
 | LM Studio | ONBOARDING | `AGENTS.md`, `STATUS.md`, `PROJECT_STATE.md`, `docs/Contract.md` | Read onboarding files. Confirmed Git workflow and contract rules. Ready for task assignment. |
-| ChatGPT | REVIEW | `scripts/StartDataCollector.ps1`, `scripts/StartFrontend.ps1`, provider scripts, `docs/Contract.md` | Added provider switching for collector startup while preserving canonical JSON shapes. `mock` remains default; `twse` provider stubs fail clearly until real TWSE fetch logic is implemented. PowerShell syntax checks passed. Branch creation was blocked by tool safety check, so work stayed on `chatgpt/complete-local-mvp`. |
-| ChatGPT | 檢視 | `scripts/StartDataCollector.ps1`, `scripts/StartFrontend.ps1`, provider 腳本、`docs/Contract.md` | 已新增 collector 啟動時的 provider 切換，並維持正式 JSON 契約。`mock` 仍為預設；`twse` provider 暫以明確錯誤占位，等待後續實作真實 TWSE 抓取邏輯。PowerShell 語法檢查通過。建立新分支被工具安全檢查擋下，因此本次修改保留在 `chatgpt/complete-local-mvp`。 |
+| ChatGPT | REVIEW | `scripts/FetchIntraday.Twse.ps1`, `scripts/FetchDaily.Twse.ps1`, `docs/Contract.md`, `STATUS.md` | Implemented the `twse` provider scripts for realtime MIS quotes and daily candles while preserving canonical JSON shapes. PowerShell syntax checks passed. Smoke tests passed for TWSE `2330` and TPEx `5425` using temp output files. |
+| ChatGPT | 檢視 | `scripts/FetchIntraday.Twse.ps1`, `scripts/FetchDaily.Twse.ps1`, `docs/Contract.md`, `STATUS.md` | 已實作 `twse` provider 腳本，支援 MIS 即時報價與日線 candles，並維持正式 JSON 契約不變。PowerShell 語法檢查通過，並已用暫存輸出檔完成上市 `2330` 與上櫃 `5425` smoke test。 |
 | Human | REVIEW | onboarding flow, Git branch | Review `AGENTS.md` and onboarding instructions before merge. |
 
 ## First Entry / 第一入口
