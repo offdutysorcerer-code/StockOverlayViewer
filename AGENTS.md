@@ -71,8 +71,8 @@ docs/governance/DecisionLog.md
 - 新功能使用 task branch。
   Use a task branch for new work.
 
-- Commit message 必須使用 Agent 前綴。
-  Commit messages must use an agent prefix.
+- Commit message 必須使用 Agent 前綴，且提交主題、tag、說明應盡量採中英雙語。
+  Commit messages must use an agent prefix, and commit subjects, tags, and descriptions should be bilingual in Chinese and English where practical.
 
 ```text
 [ChatGPT]

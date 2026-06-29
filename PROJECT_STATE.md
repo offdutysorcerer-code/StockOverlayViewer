@@ -77,6 +77,9 @@ scripts/StartDataCollector.ps1
 - Real-time market data is not integrated yet.
   尚未接入真實即時行情資料。
 
+- Daily Chart is not complete yet; current UI and mock files are scaffolding for the next task.
+  Daily Chart 尚未完成；目前 UI 與 mock 檔案是下一階段工作的基礎。
+
 - `backend/StockOverlay.Api` is not part of the active MVP runtime.
   `backend/StockOverlay.Api` 不是目前 MVP runtime 的一部分。
 
@@ -85,8 +88,10 @@ scripts/StartDataCollector.ps1
 - Local metadata contains 1,980 four-digit TWSE and TPEx company symbols.
 - Symbol lookup reads `data/symbols.json` first.
 - Intraday overlay supports Actual and Indexed modes.
-- Daily candlestick chart supports symbol switching.
+- Intraday overlay reads `mock-powershell-progressive` data from the PowerShell collector when launched through `scripts/StartFrontend.ps1`.
+- `Import-StockMetadata.ps1` supports `-OutputFile` for safe import testing without overwriting `data/symbols.json`.
 - Source, update time, and stale warnings are visible.
+- Daily Chart has UI and initial code, but it is not considered complete yet.
 
 ## Next Recommended Work / 下一步建議
 
