@@ -9,8 +9,8 @@ This file is the live coordination board for multi-agent collaboration. It stays
 | Agent | Status | Files / Area | Notes |
 |---|---|---|---|
 | LM Studio | ONBOARDING | `AGENTS.md`, `STATUS.md`, `PROJECT_STATE.md`, `docs/Contract.md` | Read onboarding files. Confirmed Git workflow and contract rules. Ready for task assignment. |
-| ChatGPT | REVIEW | `scripts/FetchIntraday.Twse.ps1`, `scripts/FetchDaily.Twse.ps1`, `docs/Contract.md`, `STATUS.md` | Implemented the `twse` provider scripts for realtime MIS quotes and daily candles while preserving canonical JSON shapes. PowerShell syntax checks passed. Smoke tests passed for TWSE `2330` and TPEx `5425` using temp output files. |
-| ChatGPT | 檢視 | `scripts/FetchIntraday.Twse.ps1`, `scripts/FetchDaily.Twse.ps1`, `docs/Contract.md`, `STATUS.md` | 已實作 `twse` provider 腳本，支援 MIS 即時報價與日線 candles，並維持正式 JSON 契約不變。PowerShell 語法檢查通過，並已用暫存輸出檔完成上市 `2330` 與上櫃 `5425` smoke test。 |
+| ChatGPT | REVIEW | `frontend/js/chart.js`, `STATUS.md` | Fixed frontend chart rendering for sparse TWSE intraday points and daily candle timestamps. Browser-module syntax check passed by copying chart.js to a temporary `.mjs` file and running `node --check`. |
+| ChatGPT | 檢視 | `frontend/js/chart.js`, `STATUS.md` | 已修正前端圖表渲染：TWSE 即時資料點位稀疏時會顯示點並允許跨空白時間連線，Daily candles 的日期改以 timestamp 餵給圖表。已將 chart.js 複製為暫存 `.mjs` 並通過 `node --check`。 |
 | Human | REVIEW | onboarding flow, Git branch | Review `AGENTS.md` and onboarding instructions before merge. |
 
 ## First Entry / 第一入口

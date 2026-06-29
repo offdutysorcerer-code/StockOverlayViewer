@@ -13,9 +13,10 @@ export function renderIntradayChart(canvas, seriesList, priceMode) {
       label: series.symbol,
       data: alignToFullLabels(series.points, values),
       tension: 0,
-      pointRadius: 0,
+      pointRadius: values.length <= 3 ? 3 : 0,
+      pointHoverRadius: 5,
       borderWidth: 2,
-      spanGaps: false
+      spanGaps: true
     };
   });
 
@@ -35,7 +36,7 @@ export function renderIntradayChart(canvas, seriesList, priceMode) {
 export function renderDailyChart(canvas, dailyData) {
   const candles = dailyData?.candles ?? [];
   const data = candles.map((candle) => ({
-    x: candle.date,
+    x: Date.parse(`${candle.date}T00:00:00`),
     o: Number(candle.open),
     h: Number(candle.high),
     l: Number(candle.low),
