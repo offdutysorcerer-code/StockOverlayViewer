@@ -27,7 +27,7 @@ function Write-JsonFileUtf8([string]$Path, $Value) {
 
 function Invoke-YahooChart([string]$StockSymbol) {
   $escapedSymbol = [uri]::EscapeDataString($StockSymbol)
-  $uri = "https://query1.finance.yahoo.com/v8/finance/chart/${escapedSymbol}?range=6mo&interval=1d&includePrePost=false"
+  $uri = "https://query1.finance.yahoo.com/v8/finance/chart/${escapedSymbol}?range=1y&interval=1d&includePrePost=false"
   $headers = @{
     "User-Agent" = "Mozilla/5.0 StockOverlayViewer/1.0"
     "Accept" = "application/json,text/plain,*/*"
@@ -97,7 +97,7 @@ if ($candles.Count -eq 0) {
 
 $resultObject = [ordered]@{
   symbol = $normalizedSymbol
-  candles = @($candles | Sort-Object date)
+  candles = @($candles | Sort-Object { $_.date })
   source = "yahoo-finance-chart-1d"
   updatedAt = (Get-Date).ToString("o")
 }

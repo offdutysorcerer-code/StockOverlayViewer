@@ -48,9 +48,9 @@ function ConvertTo-NumberOrNull($Value) {
   return $null
 }
 
-function ConvertTo-EasternTime([int64]$UnixSeconds) {
+function ConvertTo-TaiwanTime([int64]$UnixSeconds) {
   $utc = [DateTimeOffset]::FromUnixTimeSeconds($UnixSeconds).UtcDateTime
-  $timeZone = [System.TimeZoneInfo]::FindSystemTimeZoneById("Eastern Standard Time")
+  $timeZone = [System.TimeZoneInfo]::FindSystemTimeZoneById("Taipei Standard Time")
   return [System.TimeZoneInfo]::ConvertTimeFromUtc($utc, $timeZone)
 }
 
@@ -77,7 +77,7 @@ for ($i = 0; $i -lt $timestamps.Count; $i++) {
   $close = ConvertTo-NumberOrNull $closes[$i]
   if ($null -eq $close) { continue }
 
-  $localTime = ConvertTo-EasternTime ([int64]$timestamps[$i])
+  $localTime = ConvertTo-TaiwanTime ([int64]$timestamps[$i])
   $volume = 0
   if ($i -lt $volumes.Count -and $null -ne $volumes[$i]) { $volume = [int64]$volumes[$i] }
 
@@ -93,13 +93,13 @@ if ($points.Count -eq 0) {
 }
 
 $lastTimestamp = [int64]$timestamps[$timestamps.Count - 1]
-$lastLocalTime = ConvertTo-EasternTime $lastTimestamp
+$lastLocalTime = ConvertTo-TaiwanTime $lastTimestamp
 $resultObject = [ordered]@{
   symbol = $normalizedSymbol
   date = $lastLocalTime.ToString("yyyy-MM-dd")
   iteration = $Iteration
   simulatedTime = $points[-1].time
-  isComplete = ($points[-1].time -ge "16:00:00")
+  isComplete = ($points.Count -ge 390)
   points = $points
   source = "yahoo-finance-chart-1m"
   updatedAt = (Get-Date).ToString("o")

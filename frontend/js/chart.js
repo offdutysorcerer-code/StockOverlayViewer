@@ -1,9 +1,8 @@
-let intradayChart;
+﻿let intradayChart;
 let dailyChart;
 
-const FULL_INTRADAY_LABELS = createFullIntradayLabels();
-
 export function renderIntradayChart(canvas, seriesList, priceMode) {
+  const labels = createIntradayLabels(seriesList);
   const datasets = seriesList.map((series) => {
     const prices = series.points.map((point) => point.price);
     const normalized = normalizeToBase100(prices);
@@ -11,7 +10,7 @@ export function renderIntradayChart(canvas, seriesList, priceMode) {
 
     return {
       label: series.symbol,
-      data: alignToFullLabels(series.points, values),
+      data: alignToLabels(series.points, values, labels),
       tension: 0,
       pointRadius: values.length <= 3 ? 3 : 0,
       pointHoverRadius: 5,
@@ -23,12 +22,13 @@ export function renderIntradayChart(canvas, seriesList, priceMode) {
   if (!intradayChart) {
     intradayChart = new Chart(canvas, {
       type: "line",
-      data: { labels: FULL_INTRADAY_LABELS, datasets },
+      data: { labels, datasets },
       options: createChartOptions()
     });
     return;
   }
 
+  intradayChart.data.labels = labels;
   intradayChart.data.datasets = datasets;
   intradayChart.update("none");
 }
@@ -40,7 +40,8 @@ export function renderDailyChart(canvas, dailyData) {
     o: Number(candle.open),
     h: Number(candle.high),
     l: Number(candle.low),
-    c: Number(candle.close)
+    c: Number(candle.close),
+    date: candle.date
   }));
 
   if (!dailyChart) {
@@ -57,29 +58,14 @@ export function renderDailyChart(canvas, dailyData) {
           }
         }]
       },
-      options: {
-        ...createChartOptions(),
-        parsing: false,
-        scales: {
-          x: {
-            type: "time",
-            time: { unit: "day", tooltipFormat: "yyyy-MM-dd" },
-            ticks: { color: "#9ca3af", maxRotation: 0 },
-            grid: { color: "#374151" }
-          },
-          y: {
-            position: "right",
-            ticks: { color: "#9ca3af" },
-            grid: { color: "#374151" }
-          }
-        }
-      }
+      options: createDailyChartOptions()
     });
     return;
   }
 
   dailyChart.data.datasets[0].label = dailyData?.symbol ?? "Daily";
   dailyChart.data.datasets[0].data = data;
+  dailyChart.resetZoom?.();
   dailyChart.update("none");
 }
 
@@ -89,22 +75,29 @@ export function clearDailyChart() {
   dailyChart.update("none");
 }
 
-function createFullIntradayLabels() {
-  const labels = [];
-  const start = new Date("2000-01-01T09:00:00");
-
-  for (let i = 0; i < 55; i += 1) {
-    const time = new Date(start.getTime() + i * 5 * 60 * 1000);
-    labels.push(time.toTimeString().slice(0, 8));
-  }
-
-  return labels;
+function createIntradayLabels(seriesList) {
+  const labels = new Set();
+  seriesList.forEach((series) => {
+    (series.points ?? []).forEach((point) => {
+      if (point.time) labels.add(point.time);
+    });
+  });
+  return [...labels].sort((a, b) => intradaySortKey(a) - intradaySortKey(b));
 }
 
-function alignToFullLabels(points, values) {
+function intradaySortKey(value) {
+  const [hourText, minuteText, secondText] = String(value).split(":");
+  const hour = Number(hourText) || 0;
+  const minute = Number(minuteText) || 0;
+  const second = Number(secondText) || 0;
+  const raw = hour * 3600 + minute * 60 + second;
+  return hour < 8 ? raw + 24 * 3600 : raw;
+}
+
+function alignToLabels(points, values, labels) {
   const map = new Map();
   points.forEach((point, index) => map.set(point.time, values[index]));
-  return FULL_INTRADAY_LABELS.map((label) => map.get(label) ?? null);
+  return labels.map((label) => map.get(label) ?? null);
 }
 
 function createChartOptions() {
@@ -127,6 +120,51 @@ function createChartOptions() {
       }
     }
   };
+}
+
+function createDailyChartOptions() {
+  return {
+    ...createChartOptions(),
+    parsing: false,
+    interaction: { mode: "nearest", intersect: true },
+    plugins: {
+      ...createChartOptions().plugins,
+      tooltip: {
+        callbacks: {
+          title: (items) => {
+            const item = items[0]?.raw;
+            return item?.date ?? "";
+          },
+          label: (context) => {
+            const item = context.raw;
+            if (!item) return "";
+            return `O: ${formatPrice(item.o)}  H: ${formatPrice(item.h)}  L: ${formatPrice(item.l)}  C: ${formatPrice(item.c)}`;
+          }
+        }
+      },
+      zoom: {
+        pan: { enabled: true, mode: "x" },
+        zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: "x" }
+      }
+    },
+    scales: {
+      x: {
+        type: "time",
+        time: { unit: "day", tooltipFormat: "yyyy-MM-dd" },
+        ticks: { color: "#9ca3af", maxRotation: 0 },
+        grid: { color: "#374151" }
+      },
+      y: {
+        position: "right",
+        ticks: { color: "#9ca3af" },
+        grid: { color: "#374151" }
+      }
+    }
+  };
+}
+
+function formatPrice(value) {
+  return Number(value).toFixed(2);
 }
 
 function normalizeToBase100(values) {
