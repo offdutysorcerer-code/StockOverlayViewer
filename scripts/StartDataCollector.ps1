@@ -1,6 +1,6 @@
 param(
   [switch]$Mock,
-  [ValidateSet("mock", "twse")]
+  [ValidateSet("mock", "twse", "us")]
   [string]$Provider = "mock",
   [int]$IntervalSeconds = 10,
   [int]$DurationSeconds = 0,
@@ -54,6 +54,7 @@ function Get-ProviderScript {
   $scriptName = switch ($ProviderName) {
     "mock" { "Fetch$Kind.Mock.ps1" }
     "twse" { "Fetch$Kind.Twse.ps1" }
+    "us" { "Fetch$Kind.Us.ps1" }
     default { throw "Unsupported provider: $ProviderName" }
   }
 
@@ -70,7 +71,10 @@ $intradayProviderScript = Get-ProviderScript -Kind "Intraday" -ProviderName $pro
 $dailyProviderScript = Get-ProviderScript -Kind "Daily" -ProviderName $providerName
 
 $groups = Read-JsonFileUtf8 $groupsPath
-$symbols = @($groups | ForEach-Object { $_.symbols } | Sort-Object -Unique)
+$symbols = switch ($providerName) {
+  "us" { @("AAPL", "MSFT", "NVDA", "AMD", "TSM") }
+  default { @($groups | Where-Object { $_.id -ne "us-mvp" } | ForEach-Object { $_.symbols } | Sort-Object -Unique) }
+}
 $startedAt = Get-Date
 $iteration = 0
 

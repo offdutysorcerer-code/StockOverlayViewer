@@ -37,7 +37,7 @@ export async function lookupSymbol(symbol) {
 }
 
 export async function startMockFeed(intervalSeconds = 2, durationSeconds = 60, provider = "mock") {
-  const normalizedProvider = provider === "twse" ? "twse" : "mock";
+  const normalizedProvider = ["mock", "twse", "us"].includes(provider) ? provider : "mock";
   return await postJson(`/api/collector/start?intervalSeconds=${intervalSeconds}&durationSeconds=${durationSeconds}&provider=${normalizedProvider}`, {});
 }
 

@@ -48,5 +48,18 @@
                         "8261"
                     ],
         "descriptionKey":  "group.powerSemiconductor.description"
+    },
+    {
+        "id":  "us-mvp",
+        "name":  "US MVP",
+        "displayNameKey":  "group.usMvp",
+        "symbols":  [
+                        "AAPL",
+                        "MSFT",
+                        "NVDA",
+                        "AMD",
+                        "TSM"
+                    ],
+        "descriptionKey":  "group.usMvp.description"
     }
 ]

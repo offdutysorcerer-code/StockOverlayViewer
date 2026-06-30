@@ -188,8 +188,8 @@ function Handle-Api($Context) {
     $provider = $Context.Request.QueryString["provider"]
     if ([string]::IsNullOrWhiteSpace($provider)) { $provider = "mock" }
     $provider = $provider.Trim().ToLowerInvariant()
-    if (@("mock", "twse") -notcontains $provider) {
-      Write-JsonResponse $Context 400 @{ error = "UnsupportedProvider"; message = "provider must be mock or twse"; provider = $provider }
+    if (@("mock", "twse", "us") -notcontains $provider) {
+      Write-JsonResponse $Context 400 @{ error = "UnsupportedProvider"; message = "provider must be mock, twse, or us"; provider = $provider }
       return $true
     }
     Write-JsonResponse $Context 200 (Start-Collector $interval $duration $provider)

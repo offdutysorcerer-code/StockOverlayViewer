@@ -90,9 +90,9 @@ function renderAll() {
 }
 
 async function startFeedFromUi() {
-  const provider = el.providerSelect.value === "twse" ? "twse" : "mock";
-  const intervalSeconds = provider === "twse" ? 10 : 2;
-  const durationSeconds = provider === "twse" ? 300 : 60;
+  const provider = ["mock", "twse", "us"].includes(el.providerSelect.value) ? el.providerSelect.value : "mock";
+  const intervalSeconds = provider === "mock" ? 2 : 10;
+  const durationSeconds = provider === "mock" ? 60 : 300;
   el.intradayStatus.textContent = `Starting ${provider} feed...`;
   const result = await startMockFeed(intervalSeconds, durationSeconds, provider);
   el.intradayStatus.textContent = `${provider} feed ${result.status} | pid ${result.pid ?? "-"}`;
@@ -241,8 +241,8 @@ async function importSymbolsFromFile(event) {
         
         let codeIdx = -1, nameIdx = -1;
         for (let i = 0; i < headers.length; i++) {
-          if (headers[i].match(/代號|code|stock.*code/)) codeIdx = i;
-          if (headers[i].match(/名稱|name|stock.*name/)) nameIdx = i;
+          if (headers[i].match(/隞??|code|stock.*code/)) codeIdx = i;
+          if (headers[i].match(/?迂|name|stock.*name/)) nameIdx = i;
         }
         
         // Fallback: assume first column is code, second is name
