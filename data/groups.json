@@ -59,7 +59,8 @@
                         "NVDA",
                         "AMD",
                         "TSM",
-                        "MU"
+                        "MU",
+                        "GLW"
                     ],
         "descriptionKey":  "group.usMvp.description"
     }

@@ -2,7 +2,7 @@ param(
   [switch]$Mock,
   [ValidateSet("mock", "twse", "us")]
   [string]$Provider = "mock",
-  [int]$IntervalSeconds = 10,
+  [int]$IntervalSeconds = 5,
   [int]$DurationSeconds = 0,
   [switch]$Once
 )
@@ -66,15 +66,19 @@ function Get-ProviderScript {
   return $scriptPath
 }
 
+function Get-ProviderSymbols([string]$ProviderName) {
+  $groups = Read-JsonFileUtf8 $groupsPath
+  $symbols = switch ($ProviderName) {
+    "us" { @($groups | Where-Object { $_.id -eq "us-mvp" } | ForEach-Object { $_.symbols } | Sort-Object -Unique) }
+    default { @($groups | Where-Object { $_.id -ne "us-mvp" } | ForEach-Object { $_.symbols } | Sort-Object -Unique) }
+  }
+  return @($symbols | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+}
+
 $providerName = Resolve-ProviderName
 $intradayProviderScript = Get-ProviderScript -Kind "Intraday" -ProviderName $providerName
 $dailyProviderScript = Get-ProviderScript -Kind "Daily" -ProviderName $providerName
 
-$groups = Read-JsonFileUtf8 $groupsPath
-$symbols = switch ($providerName) {
-  "us" { @($groups | Where-Object { $_.id -eq "us-mvp" } | ForEach-Object { $_.symbols } | Sort-Object -Unique) }
-  default { @($groups | Where-Object { $_.id -ne "us-mvp" } | ForEach-Object { $_.symbols } | Sort-Object -Unique) }
-}
 $startedAt = Get-Date
 $iteration = 0
 
@@ -82,7 +86,7 @@ Write-Host "StockOverlayViewer data collector" -ForegroundColor Cyan
 Write-Host "Provider: $providerName"
 Write-Host "Intraday script: $([System.IO.Path]::GetFileName($intradayProviderScript))"
 Write-Host "Daily script: $([System.IO.Path]::GetFileName($dailyProviderScript))"
-Write-Host "Symbols: $($symbols -join ', ')"
+Write-Host "Symbols: $((Get-ProviderSymbols $providerName) -join ', ')"
 Write-Host "IntervalSeconds: $IntervalSeconds"
 if ($DurationSeconds -gt 0) { Write-Host "DurationSeconds: $DurationSeconds" }
 
@@ -92,6 +96,7 @@ if (!(Test-Path $dailyPath)) { New-Item -ItemType Directory -Path $dailyPath -Fo
 function Update-Once {
   param([int]$Iteration)
 
+  $symbols = Get-ProviderSymbols $providerName
   $symbolIndex = [ordered]@{}
 
   foreach ($symbol in $symbols) {

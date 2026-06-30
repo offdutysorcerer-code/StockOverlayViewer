@@ -1,4 +1,4 @@
-﻿import { getGroups, saveGroups, resetGroups, getIntraday, getDaily, getLatestIndex, getSymbolsMeta, saveSymbolsMeta, lookupSymbol, startMockFeed, stopMockFeed } from "./api.js";
+import { getGroups, saveGroups, resetGroups, getIntraday, getDaily, getLatestIndex, getSymbolsMeta, saveSymbolsMeta, lookupSymbol, startMockFeed, stopMockFeed } from "./api.js";
 import { renderIntradayChart, renderDailyChart, clearDailyChart } from "./chart.js";
 import { renderGroups, renderSymbols, getSymbolLabel } from "./groups.js";
 
@@ -91,7 +91,7 @@ function renderAll() {
 
 async function startFeedFromUi() {
   const provider = ["mock", "twse", "us"].includes(el.providerSelect.value) ? el.providerSelect.value : "mock";
-  const intervalSeconds = provider === "mock" ? 2 : 10;
+  const intervalSeconds = provider === "mock" ? 2 : 5;
   const durationSeconds = provider === "mock" ? 60 : 300;
   el.intradayStatus.textContent = `Starting ${provider} feed...`;
   const result = await startMockFeed(intervalSeconds, durationSeconds, provider);
