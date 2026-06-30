@@ -58,7 +58,8 @@
                         "MSFT",
                         "NVDA",
                         "AMD",
-                        "TSM"
+                        "TSM",
+                        "MU"
                     ],
         "descriptionKey":  "group.usMvp.description"
     }

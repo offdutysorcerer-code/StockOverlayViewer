@@ -10,11 +10,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$supportedSymbols = @("AAPL", "MSFT", "NVDA", "AMD", "TSM")
 $normalizedSymbol = $Symbol.Trim().ToUpperInvariant()
-if ($supportedSymbols -notcontains $normalizedSymbol) {
-  throw "Unsupported US MVP symbol: $Symbol. Supported symbols: $($supportedSymbols -join ', ')"
-}
 
 function Write-JsonFileUtf8([string]$Path, $Value) {
   $dir = Split-Path -Parent $Path

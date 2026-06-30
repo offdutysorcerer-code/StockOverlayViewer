@@ -1,4 +1,4 @@
-﻿let intradayChart;
+let intradayChart;
 let dailyChart;
 
 export function renderIntradayChart(canvas, seriesList, priceMode) {
@@ -65,7 +65,6 @@ export function renderDailyChart(canvas, dailyData) {
 
   dailyChart.data.datasets[0].label = dailyData?.symbol ?? "Daily";
   dailyChart.data.datasets[0].data = data;
-  dailyChart.resetZoom?.();
   dailyChart.update("none");
 }
 
@@ -76,13 +75,34 @@ export function clearDailyChart() {
 }
 
 function createIntradayLabels(seriesList) {
-  const labels = new Set();
-  seriesList.forEach((series) => {
-    (series.points ?? []).forEach((point) => {
-      if (point.time) labels.add(point.time);
-    });
-  });
-  return [...labels].sort((a, b) => intradaySortKey(a) - intradaySortKey(b));
+  const hasUsSession = seriesList.some((series) =>
+    (series.points ?? []).some((point) => {
+      const hour = Number(String(point.time ?? "").slice(0, 2));
+      return hour >= 20 || hour < 8;
+    })
+  );
+
+  return hasUsSession
+    ? createTimeLabels("21:30:00", "04:00:00", 1)
+    : createTimeLabels("09:00:00", "13:30:00", 1);
+}
+
+function createTimeLabels(start, end, stepMinutes) {
+  const labels = [];
+  const startSeconds = intradaySortKey(start);
+  const endSeconds = intradaySortKey(end);
+  for (let seconds = startSeconds; seconds <= endSeconds; seconds += stepMinutes * 60) {
+    labels.push(formatIntradaySeconds(seconds));
+  }
+  return labels;
+}
+
+function formatIntradaySeconds(value) {
+  const secondsInDay = ((value % 86400) + 86400) % 86400;
+  const hour = Math.floor(secondsInDay / 3600);
+  const minute = Math.floor((secondsInDay % 3600) / 60);
+  const second = secondsInDay % 60;
+  return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}:${String(second).padStart(2, "0")}`;
 }
 
 function intradaySortKey(value) {
@@ -126,7 +146,7 @@ function createDailyChartOptions() {
   return {
     ...createChartOptions(),
     parsing: false,
-    interaction: { mode: "nearest", intersect: true },
+    interaction: { mode: "index", intersect: false },
     plugins: {
       ...createChartOptions().plugins,
       tooltip: {

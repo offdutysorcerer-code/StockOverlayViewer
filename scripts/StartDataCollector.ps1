@@ -72,7 +72,7 @@ $dailyProviderScript = Get-ProviderScript -Kind "Daily" -ProviderName $providerN
 
 $groups = Read-JsonFileUtf8 $groupsPath
 $symbols = switch ($providerName) {
-  "us" { @("AAPL", "MSFT", "NVDA", "AMD", "TSM") }
+  "us" { @($groups | Where-Object { $_.id -eq "us-mvp" } | ForEach-Object { $_.symbols } | Sort-Object -Unique) }
   default { @($groups | Where-Object { $_.id -ne "us-mvp" } | ForEach-Object { $_.symbols } | Sort-Object -Unique) }
 }
 $startedAt = Get-Date
