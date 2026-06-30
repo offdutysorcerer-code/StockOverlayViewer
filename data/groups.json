@@ -54,14 +54,24 @@
         "name":  "US MVP",
         "displayNameKey":  "group.usMvp",
         "symbols":  [
-                        "AAPL",
-                        "MSFT",
-                        "NVDA",
                         "AMD",
                         "TSM",
                         "MU",
-                        "GLW"
+                        "GLW",
+                        "SPCX",
+                        "VSH",
+                        "VPG",
+                        "ASTS"
                     ],
         "descriptionKey":  "group.usMvp.description"
+    },
+    {
+        "id":  "space",
+        "name":  "space",
+        "symbols":  [
+                        "SPCX",
+                        "ASTS",
+                        "RKLB"
+                    ]
     }
 ]
