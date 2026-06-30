@@ -1,4 +1,4 @@
-import { getGroups, saveGroups, resetGroups, getIntraday, getDaily, getLatestIndex, getSymbolsMeta, saveSymbolsMeta, lookupSymbol, startMockFeed, stopMockFeed } from "./api.js";
+﻿import { getGroups, saveGroups, resetGroups, getIntraday, getDaily, getLatestIndex, getSymbolsMeta, saveSymbolsMeta, lookupSymbol, startMockFeed, stopMockFeed } from "./api.js";
 import { renderIntradayChart, renderDailyChart, clearDailyChart } from "./chart.js";
 import { renderGroups, renderSymbols, getSymbolLabel } from "./groups.js";
 
@@ -241,8 +241,9 @@ async function importSymbolsFromFile(event) {
         
         let codeIdx = -1, nameIdx = -1;
         for (let i = 0; i < headers.length; i++) {
-          if (headers[i].match(/隞??|code|stock.*code/)) codeIdx = i;
-          if (headers[i].match(/?迂|name|stock.*name/)) nameIdx = i;
+          const header = headers[i];
+          if (header.includes("code") || header.includes("symbol") || header.includes("stock code")) codeIdx = i;
+          if (header.includes("name") || header.includes("display") || header.includes("stock name")) nameIdx = i;
         }
         
         // Fallback: assume first column is code, second is name
